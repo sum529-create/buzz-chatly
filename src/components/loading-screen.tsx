@@ -5,14 +5,19 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 `;
 const Text = styled.span`
-  font-size: 24px;
+  margin-top: 10px;
+  text-shadow: 1px 1px 1px black;
+  padding-left: 10px;
 `;
+const LoadingIcon = styled.img``;
 
 export default function LoadingScreen() {
   return (
     <Wrapper>
+      <LoadingIcon src="/images/icon-loading.gif" />
       <Text>Loading...</Text>
     </Wrapper>
   );

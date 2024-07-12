@@ -101,3 +101,7 @@ export const Switcher = styled.span`
     margin-left: 0.5rem;
   }
 `;
+
+export const SubLoadingIco = styled.img`
+  width: 24px;
+`;
