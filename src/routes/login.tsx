@@ -11,7 +11,7 @@ import {
   Error,
   Switcher,
 } from "../components/auth-component";
-import GithubBtn from "../components/github-btn";
+import ExternalLogin from "../components/external-login";
 
 export default function Login() {
   const [isLoading, setLoading] = useState(false);
@@ -88,10 +88,14 @@ export default function Login() {
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
       <Switcher>
+        Don't you remember the password?
+        <Link to="/pw-inquiry">Reset Password &rarr;</Link>
+      </Switcher>
+      <Switcher>
         Don't have an account?{" "}
         <Link to="/create-account">Create one &rarr;</Link>
       </Switcher>
-      <GithubBtn />
+      <ExternalLogin />
     </Wrapper>
   );
 }

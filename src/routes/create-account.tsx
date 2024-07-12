@@ -10,7 +10,7 @@ import {
   Error,
   Switcher,
 } from "../components/auth-component";
-import GithubBtn from "../components/github-btn";
+import ExternalLogin from "../components/external-login";
 import { auth } from "../firebase";
 
 export default function CreateAccount() {
@@ -109,7 +109,7 @@ export default function CreateAccount() {
       <Switcher>
         Already have an account? <Link to="/login">Log in &rarr;</Link>
       </Switcher>
-      <GithubBtn />
+      <ExternalLogin />
     </Wrapper>
   );
 }

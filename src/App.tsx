@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import LoadingScreen from "./components/loading-screen";
 import { auth } from "./firebase";
 import ProtectedRoute from "./components/protected-route";
+import PwInquiry from "./routes/pw-inquiry";
 
 const GlobalStyles = createGlobalStyle`
   ${reset};
@@ -20,6 +21,7 @@ const GlobalStyles = createGlobalStyle`
     background-color:#000;
     color: #FFF;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    word-break: keep-all;
   }
 `;
 
@@ -49,6 +51,10 @@ const router = createBrowserRouter([
   {
     path: "/create-account",
     element: <CreateAccount />,
+  },
+  {
+    path: "pw-inquiry",
+    element: <PwInquiry />,
   },
 ]);
 

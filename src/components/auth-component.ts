@@ -98,5 +98,6 @@ export const Switcher = styled.span`
   margin-top: 20px;
   a {
     color: #00b894;
+    margin-left: 0.5rem;
   }
 `;
