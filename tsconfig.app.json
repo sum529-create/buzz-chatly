@@ -16,14 +16,14 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
-    "typeRoots": ["./node_modules/@types"],  // 타입 정의 파일 경로 추가
-    "types": ["react", "react-dom"],  // 사용할 타입 패키지 추가
+    "typeRoots": ["./node_modules/@types"], // 타입 정의 파일 경로 추가
+    "types": ["react", "react-dom"], // 사용할 타입 패키지 추가
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }

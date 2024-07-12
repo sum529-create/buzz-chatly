@@ -1,14 +1,14 @@
 import styled from "styled-components";
-
+import PostBuzzForm from "../components/post-buzz-form";
 const MainWrapper = styled.div`
-  flex: 1;
   position: relative;
+  padding: 0 3rem;
 `;
 
 export default function Home() {
   return (
     <MainWrapper>
-      <h1>HOME</h1>
+      <PostBuzzForm />
     </MainWrapper>
   );
 }
