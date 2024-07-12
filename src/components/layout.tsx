@@ -1,10 +1,11 @@
 import { Outlet } from "react-router-dom";
+import BuzzChatlyHeader from "./header";
 
 export default function Layout() {
-    return (
-        <>
-            <h1>layout</h1>
-            <Outlet/>
-        </>
-    )
+  return (
+    <>
+      <BuzzChatlyHeader />
+      <Outlet />
+    </>
+  );
 }
