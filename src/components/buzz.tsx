@@ -31,6 +31,11 @@ const Payload = styled.p`
   font-size: 18px;
 `;
 
+const ButtonArea = styled.div`
+  display: flex;
+  gap: 5px;
+`;
+
 const DeleteButton = styled.button`
   background-color: tomato;
   color: white;
@@ -42,22 +47,40 @@ const DeleteButton = styled.button`
   text-transform: uppercase;
   border-radius: 5px;
   cursor: pointer;
+  border: 1px solid tomato;
+  box-sizing: border-box;
+`;
+
+const EditButton = styled.button`
+  background-color: #1d9bf0;
+  color: #fff;
+  font-size: 12px;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  box-sizing: border-box;
+  border: 1px solid #1d9bf0;
 `;
 
 export default function Buzz({ username, photo, buzz, userId, id }: IBuzz) {
   const user = auth.currentUser;
   const onDelete = async () => {
     if (user?.uid !== userId) return;
-    try {
-      await deleteDoc(doc(db, "buzz", id));
-      if (photo) {
-        const phtoRef = ref(storage, `buzz/${user.uid}/${id}`);
-        await deleteObject(phtoRef);
+    if (confirm("해당 버즈를 삭제하시겠습니까?"))
+      try {
+        await deleteDoc(doc(db, "buzz", id));
+        if (photo) {
+          const phtoRef = ref(storage, `buzz/${user.uid}/${id}`);
+          await deleteObject(phtoRef);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
       }
-    } catch (error) {
-      console.error(error);
-    } finally {
-    }
+  };
+  const onEdit = () => {
+    if (user?.uid !== userId) return;
   };
   return (
     <Wrapper>
@@ -65,7 +88,10 @@ export default function Buzz({ username, photo, buzz, userId, id }: IBuzz) {
         <Username>{username}</Username>
         <Payload>{buzz}</Payload>
         {user?.uid === userId ? (
-          <DeleteButton onClick={onDelete}>Delete X</DeleteButton>
+          <ButtonArea>
+            <DeleteButton onClick={onDelete}>Delete</DeleteButton>
+            <EditButton onClick={onEdit}>Edit</EditButton>
+          </ButtonArea>
         ) : null}
       </Column>
       {photo ? (

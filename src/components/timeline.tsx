@@ -25,6 +25,7 @@ const Wrapper = styled.div`
   gap: 10px;
   flex-direction: column;
   overflow-y: scroll;
+  flex: 1;
 `;
 export default function Timeline() {
   const [buzz, setBuzz] = useState<IBuzz[]>([]);

@@ -4,15 +4,31 @@ import React, { useState } from "react";
 import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
 
-const FormTitle = styled.h1`
-  font-size: 2rem;
+const FormTitle = styled.div`
   display: flex;
-  gap: 4px;
-  justify-content: flex-start;
-  flex-wrap: nowrap;
-  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
   svg {
     width: 34px;
+  }
+  .title-wrapper {
+    font-size: 2rem;
+    display: flex;
+    gap: 4px;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+  }
+  .buzz_flag_btn {
+    cursor: pointer;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    width: 24px;
+  }
+  .close_btn {
+    color: tomato;
+    border-color: tomato;
   }
 `;
 
@@ -20,6 +36,7 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
 `;
 
 const TextArea = styled.textarea`
@@ -55,6 +72,7 @@ const AttachFileButton = styled.label`
 
 const PreviewImg = styled.img`
   margin: 0 auto;
+  padding: 1.5rem 0;
   max-height: 300px;
   @media (max-width: 768px) {
     width: 100%;
@@ -81,6 +99,19 @@ const SubmitBtn = styled.input`
   }
 `;
 
+const EditArea = styled.div`
+  width: 100%;
+  position: relative;
+  svg {
+    width: 34px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 10;
+    cursor: pointer;
+  }
+`;
+
 export default function PostBuzzForm() {
   const [isLoading, setLoading] = useState(false);
   const [buzz, setBuzz] = useState("");
@@ -88,6 +119,7 @@ export default function PostBuzzForm() {
   const [previewImg, setPreviewImg] = useState<string | ArrayBuffer | null>(
     null
   );
+  const [showBuzzForm, setShowBuzzForm] = useState(false);
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBuzz(e.target.value);
   };
@@ -144,52 +176,120 @@ export default function PostBuzzForm() {
       setLoading(false);
     }
   };
+  const closeImg = () => {
+    setFile(null);
+    setPreviewImg(null);
+  };
+  const openBuzzForm = () => {
+    setShowBuzzForm((e) => !e);
+  };
   return (
     <>
       <FormTitle>
-        <svg
-          data-slot="icon"
-          fill="none"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
-          ></path>
-        </svg>
-        Today's buzz
-      </FormTitle>
-      <Form onSubmit={onSubmit}>
-        <TextArea
-          required
-          rows={5}
-          maxLength={180}
-          onChange={onChange}
-          value={buzz}
-          placeholder="What is happening?!"
-        />
-        {previewImg && (
-          <PreviewImg src={previewImg as string} alt="Preview Img" />
+        <div className="title-wrapper">
+          <svg
+            data-slot="icon"
+            fill="none"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
+            ></path>
+          </svg>
+          <h1>Today's buzz</h1>
+        </div>
+        {!showBuzzForm ? (
+          <svg
+            onClick={openBuzzForm}
+            data-slot="icon"
+            fill="none"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="buzz_flag_btn add_btn"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            ></path>
+          </svg>
+        ) : (
+          <svg
+            onClick={openBuzzForm}
+            data-slot="icon"
+            fill="none"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="buzz_flag_btn close_btn"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 12h14"
+            ></path>
+          </svg>
         )}
-        <AttachFileButton htmlFor="file">
-          {file ? "Photo added ✅" : "Add photo"}
-        </AttachFileButton>
-        <AttachFileInput
-          onChange={onFileChange}
-          type="file"
-          id="file"
-          accept="image/*"
-        />
-        <SubmitBtn
-          type="submit"
-          value={isLoading ? "Posting..." : "Post Buzz"}
-        />
-      </Form>
+      </FormTitle>
+      {showBuzzForm ? (
+        <Form onSubmit={onSubmit}>
+          <TextArea
+            required
+            rows={5}
+            maxLength={180}
+            onChange={onChange}
+            value={buzz}
+            placeholder="What is happening?!"
+          />
+          {previewImg && (
+            <>
+              <EditArea>
+                <svg
+                  onClick={closeImg}
+                  data-slot="icon"
+                  fill="none"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </EditArea>
+              <PreviewImg src={previewImg as string} alt="Preview Img" />
+            </>
+          )}
+          <AttachFileButton htmlFor="file">
+            {file ? "Photo added ✅" : "Add photo"}
+          </AttachFileButton>
+          <AttachFileInput
+            onChange={onFileChange}
+            type="file"
+            id="file"
+            accept="image/*"
+          />
+          <SubmitBtn
+            type="submit"
+            value={isLoading ? "Posting..." : "Post Buzz"}
+          />
+        </Form>
+      ) : null}
     </>
   );
 }

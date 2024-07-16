@@ -7,7 +7,7 @@ const Wrapper = styled.div`
   /* gap: 20px; */
   grid-template-columns: 1fr 5fr;
   height: 100%;
-  padding: 50px 0px;
+  /* padding: 50px 0px; */
   width: 100%;
   max-width: 860px;
 `;
@@ -17,8 +17,10 @@ const Menu = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  background-color: #218c74;
+  background-color: #222f3e;
   padding: 1rem 0;
+  position: relative;
+  height: 100%;
 `;
 
 const MenuItem = styled.div`
@@ -26,19 +28,32 @@ const MenuItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  border: 2px solid #e0e0e0;
   height: 50px;
   width: 50px;
   border-radius: 50%;
   svg {
     width: 30px;
-    fill: white;
+    fill: #e0e0e0;
   }
   &.log-out {
     border-color: tomato;
     svg {
       fill: tomato;
     }
+  }
+  img {
+    width: 50px;
+  }
+  &.logo {
+    border: none;
+  }
+  @media (max-width: 768px) {
+    width: 6.5vw;
+    height: 6.5vw;
+    min-width: 32px;
+    min-height: 32px;
+    margin: 0 12px;
   }
 `;
 
@@ -54,6 +69,11 @@ export default function Layout() {
   return (
     <Wrapper>
       <Menu>
+        <Link to="/">
+          <MenuItem className="logo">
+            <img src="/images/logo.png" alt="buzz chatly logo" />
+          </MenuItem>
+        </Link>
         <Link to="/">
           <MenuItem>
             <svg

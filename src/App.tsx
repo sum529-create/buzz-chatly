@@ -59,14 +59,15 @@ const router = createBrowserRouter([
 ]);
 
 const Wrapper = styled.div`
-  height: 100vh;
+  /* height: 100vh; */
   display: flex;
   justify-content: center;
   width: 48rem; // 768px
   margin: 0 auto;
-  background-color: #2d3436;
+  background-color: #1e272e;
   position: relative;
   flex-direction: column;
+  min-height: 100vh;
   @media (max-width: 768px) {
     width: auto;
   }

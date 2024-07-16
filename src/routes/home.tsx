@@ -3,10 +3,11 @@ import PostBuzzForm from "../components/post-buzz-form";
 import Timeline from "../components/timeline";
 const MainWrapper = styled.div`
   position: relative;
-  padding: 0 3rem;
-  display: grid;
+  padding: 50px 3rem;
+  display: flex;
   gap: 1rem;
-  grid-template-rows: auto 1fr 5fr;
+  flex-direction: column;
+  height: 100vh;
 `;
 
 export default function Home() {
