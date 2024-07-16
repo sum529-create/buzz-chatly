@@ -1,4 +1,7 @@
+import { deleteDoc, doc } from "firebase/firestore";
+import { deleteObject, ref } from "firebase/storage";
 import { styled } from "styled-components";
+import { auth, db, storage } from "../firebase";
 import { IBuzz } from "./timeline";
 
 const Wrapper = styled.div`
@@ -28,12 +31,42 @@ const Payload = styled.p`
   font-size: 18px;
 `;
 
-export default function Buzz({ username, photo, buzz }: IBuzz) {
+const DeleteButton = styled.button`
+  background-color: tomato;
+  color: white;
+  text-align: center;
+  font-weight: 600;
+  border: 0;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
+export default function Buzz({ username, photo, buzz, userId, id }: IBuzz) {
+  const user = auth.currentUser;
+  const onDelete = async () => {
+    if (user?.uid !== userId) return;
+    try {
+      await deleteDoc(doc(db, "buzz", id));
+      if (photo) {
+        const phtoRef = ref(storage, `buzz/${user.uid}/${id}`);
+        await deleteObject(phtoRef);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  };
   return (
     <Wrapper>
       <Column>
         <Username>{username}</Username>
         <Payload>{buzz}</Payload>
+        {user?.uid === userId ? (
+          <DeleteButton onClick={onDelete}>Delete X</DeleteButton>
+        ) : null}
       </Column>
       {photo ? (
         <Column>

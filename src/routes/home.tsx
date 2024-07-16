@@ -5,7 +5,8 @@ const MainWrapper = styled.div`
   position: relative;
   padding: 0 3rem;
   display: grid;
-  grid-template-rows: 1fr 5fr;
+  gap: 1rem;
+  grid-template-rows: auto 1fr 5fr;
 `;
 
 export default function Home() {
