@@ -1,8 +1,9 @@
 import { addDoc, collection, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
+import { IBuzz } from "./timeline";
 
 const FormTitle = styled.div`
   display: flex;
@@ -112,9 +113,19 @@ const EditArea = styled.div`
   }
 `;
 
-export default function PostBuzzForm() {
+interface PostBuzzFormProps extends Partial<IBuzz> {}
+
+export default function PostBuzzForm({
+  username,
+  photo,
+  buzz,
+  userId,
+  id,
+}: PostBuzzFormProps) {
+  console.log(username);
+
   const [isLoading, setLoading] = useState(false);
-  const [buzz, setBuzz] = useState("");
+  const [newBuzz, setBuzz] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewImg, setPreviewImg] = useState<string | ArrayBuffer | null>(
     null
@@ -148,11 +159,11 @@ export default function PostBuzzForm() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const user = auth.currentUser;
-    if (!user || isLoading || buzz === "" || buzz.length > 180) return;
+    if (!user || isLoading || newBuzz === "" || newBuzz.length > 180) return;
     try {
       setLoading(true);
       const doc = await addDoc(collection(db, "buzz"), {
-        buzz,
+        newBuzz,
         createdAt: Date.now(),
         username: user.displayName || "Anonymous",
         userId: user.uid,
@@ -249,7 +260,7 @@ export default function PostBuzzForm() {
             rows={5}
             maxLength={180}
             onChange={onChange}
-            value={buzz}
+            value={newBuzz}
             placeholder="What is happening?!"
           />
           {previewImg && (

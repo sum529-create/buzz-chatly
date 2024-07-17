@@ -27,7 +27,12 @@ const Wrapper = styled.div`
   overflow-y: scroll;
   flex: 1;
 `;
-export default function Timeline() {
+
+interface TimelineProps {
+  onEdit: (buzz: IBuzz) => void;
+}
+
+export default function Timeline({ onEdit }: TimelineProps) {
   const [buzz, setBuzz] = useState<IBuzz[]>([]);
   useEffect(() => {
     let unsubscribe: Unsubscribe | null = null;
@@ -78,7 +83,7 @@ export default function Timeline() {
   return (
     <Wrapper>
       {buzz.map((e) => (
-        <Buzz key={e.id} {...e} />
+        <Buzz key={e.id} {...e} onEdit={onEdit} />
       ))}
     </Wrapper>
   );

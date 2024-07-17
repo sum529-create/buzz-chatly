@@ -63,11 +63,22 @@ const EditButton = styled.button`
   border: 1px solid #1d9bf0;
 `;
 
-export default function Buzz({ username, photo, buzz, userId, id }: IBuzz) {
+interface BuzzProps extends IBuzz {
+  onEdit: (buzz: IBuzz) => void;
+}
+
+export default function Buzz({
+  username,
+  photo,
+  buzz,
+  userId,
+  id,
+  onEdit,
+}: BuzzProps) {
   const user = auth.currentUser;
   const onDelete = async () => {
     if (user?.uid !== userId) return;
-    if (confirm("해당 버즈를 삭제하시겠습니까?"))
+    if (confirm("해당 버즈를 삭제하시겠습니까?")) {
       try {
         await deleteDoc(doc(db, "buzz", id));
         if (photo) {
@@ -76,11 +87,12 @@ export default function Buzz({ username, photo, buzz, userId, id }: IBuzz) {
         }
       } catch (error) {
         console.error(error);
-      } finally {
       }
+    }
   };
-  const onEdit = () => {
+  const handleEdit = () => {
     if (user?.uid !== userId) return;
+    onEdit({ username, photo, buzz, userId, id, createdAt: 0 }); // createdAt 임의로 추가
   };
   return (
     <Wrapper>
@@ -90,7 +102,7 @@ export default function Buzz({ username, photo, buzz, userId, id }: IBuzz) {
         {user?.uid === userId ? (
           <ButtonArea>
             <DeleteButton onClick={onDelete}>Delete</DeleteButton>
-            <EditButton onClick={onEdit}>Edit</EditButton>
+            <EditButton onClick={handleEdit}>Edit</EditButton>
           </ButtonArea>
         ) : null}
       </Column>

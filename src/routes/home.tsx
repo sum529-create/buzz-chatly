@@ -1,6 +1,7 @@
+import { useState } from "react";
 import styled from "styled-components";
 import PostBuzzForm from "../components/post-buzz-form";
-import Timeline from "../components/timeline";
+import Timeline, { IBuzz } from "../components/timeline";
 const MainWrapper = styled.div`
   position: relative;
   padding: 50px 3rem;
@@ -11,10 +12,15 @@ const MainWrapper = styled.div`
 `;
 
 export default function Home() {
+  const [selectedBuzz, setSelectedBuzz] = useState<IBuzz | null>(null);
+
+  const handleEdit = (buzz: IBuzz) => {
+    setSelectedBuzz(buzz);
+  };
   return (
     <MainWrapper>
-      <PostBuzzForm />
-      <Timeline />
+      {selectedBuzz ? <PostBuzzForm {...selectedBuzz} /> : <PostBuzzForm />}
+      <Timeline onEdit={handleEdit} />
     </MainWrapper>
   );
 }
