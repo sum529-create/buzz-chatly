@@ -82,8 +82,8 @@ export default function Buzz({
       try {
         await deleteDoc(doc(db, "buzz", id));
         if (photo) {
-          const phtoRef = ref(storage, `buzz/${user.uid}/${id}`);
-          await deleteObject(phtoRef);
+          const photoRef = ref(storage, `buzz/${user.uid}/${id}`);
+          await deleteObject(photoRef);
         }
       } catch (error) {
         console.error(error);

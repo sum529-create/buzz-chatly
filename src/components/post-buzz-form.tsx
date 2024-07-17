@@ -1,6 +1,11 @@
-import { addDoc, collection, updateDoc } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import React, { useEffect, useState } from "react";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
+import React, { useEffect, useRef, useState } from "react";
 import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { IBuzz } from "./timeline";
@@ -116,14 +121,11 @@ const EditArea = styled.div`
 interface PostBuzzFormProps extends Partial<IBuzz> {}
 
 export default function PostBuzzForm({
-  username,
   photo,
   buzz,
-  userId,
   id,
+  userId,
 }: PostBuzzFormProps) {
-  console.log(username);
-
   const [isLoading, setLoading] = useState(false);
   const [newBuzz, setBuzz] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -131,6 +133,17 @@ export default function PostBuzzForm({
     null
   );
   const [showBuzzForm, setShowBuzzForm] = useState(false);
+
+  useEffect(() => {
+    if (buzz !== undefined) {
+      setBuzz(buzz);
+      setShowBuzzForm(true);
+    }
+    if (photo !== undefined) {
+      setPreviewImg(photo);
+    }
+  }, [buzz, photo]);
+
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBuzz(e.target.value);
   };
@@ -162,25 +175,43 @@ export default function PostBuzzForm({
     if (!user || isLoading || newBuzz === "" || newBuzz.length > 180) return;
     try {
       setLoading(true);
-      const doc = await addDoc(collection(db, "buzz"), {
-        newBuzz,
-        createdAt: Date.now(),
-        username: user.displayName || "Anonymous",
-        userId: user.uid,
-      });
+      let docRef;
+
+      // id가 존재하면 기존 Buzz 업데이트, 그렇지 않으면 새 Buzz 추가
+      if (id) {
+        if (photo && !previewImg) {
+          const photoRef = ref(storage, `buzz/${userId}/${id}`);
+          await deleteObject(photoRef);
+        }
+        docRef = doc(db, "buzz", id);
+        await updateDoc(docRef, {
+          buzz: newBuzz,
+          photo: photo && !previewImg && null,
+          updatedAt: Date.now(),
+        });
+      } else {
+        docRef = await addDoc(collection(db, "buzz"), {
+          buzz: newBuzz,
+          createdAt: Date.now(),
+          username: user.displayName || "Anonymous",
+          userId: user.uid,
+        });
+      }
+
       if (file) {
-        const locationRef = ref(storage, `buzz/${user.uid}/${doc.id}`); // 파일 저장 위치를 직접 지정 할 수 있다.
+        const locationRef = ref(storage, `buzz/${user.uid}/${docRef.id}`); // 파일 저장 위치를 직접 지정 할 수 있다.
 
         const result = await uploadBytes(locationRef, file);
         const url = await getDownloadURL(result.ref); // 방금 업로드 한 이미지 파일의 url
 
-        await updateDoc(doc, {
+        await updateDoc(docRef, {
           photo: url,
         });
       }
       setBuzz("");
       setFile(null);
       setPreviewImg(null);
+      setShowBuzzForm(false);
     } catch (error) {
       console.error("error! : ", error);
     } finally {
@@ -192,6 +223,8 @@ export default function PostBuzzForm({
     setPreviewImg(null);
   };
   const openBuzzForm = () => {
+    closeImg();
+    setBuzz("");
     setShowBuzzForm((e) => !e);
   };
   return (
@@ -297,7 +330,7 @@ export default function PostBuzzForm({
           />
           <SubmitBtn
             type="submit"
-            value={isLoading ? "Posting..." : "Post Buzz"}
+            value={isLoading ? "Posting..." : id ? "Edit Buzz" : "Post Buzz"}
           />
         </Form>
       ) : null}
