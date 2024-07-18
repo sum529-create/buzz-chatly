@@ -1,5 +1,16 @@
 import styled from "styled-components";
 
+export const MainWrapper = styled.div`
+  position: relative;
+  padding: 50px 3rem;
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  height: 100vh;
+  flex-wrap: nowrap;
+  align-items: center;
+`;
+
 export const Wrapper = styled.div`
   height: 100%;
   display: flex;

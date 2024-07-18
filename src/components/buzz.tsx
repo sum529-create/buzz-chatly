@@ -36,7 +36,7 @@ const ButtonArea = styled.div`
   gap: 5px;
 `;
 
-const DeleteButton = styled.button`
+export const DeleteButton = styled.button`
   background-color: tomato;
   color: white;
   text-align: center;
@@ -51,7 +51,7 @@ const DeleteButton = styled.button`
   box-sizing: border-box;
 `;
 
-const EditButton = styled.button`
+export const EditButton = styled.button`
   background-color: #1d9bf0;
   color: #fff;
   font-size: 12px;

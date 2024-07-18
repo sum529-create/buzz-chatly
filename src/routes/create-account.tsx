@@ -40,7 +40,6 @@ export default function CreateAccount() {
       ...preVal,
       error: "",
     }));
-    console.log(email, name, password);
     if (isLoading || email === "" || name === "" || password === "") {
       return;
     }

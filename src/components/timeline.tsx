@@ -27,6 +27,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   overflow-y: scroll;
   flex: 1;
+  width: 100%;
 `;
 
 interface TimelineProps {

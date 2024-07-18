@@ -15,6 +15,7 @@ const FormTitle = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
+  width: 100%;
   svg {
     width: 34px;
   }
@@ -43,6 +44,7 @@ const Form = styled.form`
   flex-direction: column;
   gap: 10px;
   position: relative;
+  width: 100%;
 `;
 
 const TextArea = styled.textarea`
