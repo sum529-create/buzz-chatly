@@ -16,7 +16,6 @@ export default function Home() {
 
   const handleEdit = (buzz: IBuzz) => {
     setSelectedBuzz(buzz);
-    console.log(buzz);
   };
   return (
     <MainWrapper>

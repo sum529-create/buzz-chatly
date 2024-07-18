@@ -16,6 +16,7 @@ export interface IBuzz {
   id: string;
   buzz: string;
   createdAt: number;
+  updatedAt: number;
   photo: string;
   userId: string;
   username: string;
@@ -61,7 +62,8 @@ export default function Timeline({ onEdit }: TimelineProps) {
       // 이벤트 리스너에 대한 구독은 취소해 둘것, 계속 사용 시 비용 지불됨
       unsubscribe = await onSnapshot(buzzQuery, (snapshot) => {
         const buzzs = snapshot.docs.map((doc) => {
-          const { buzz, createdAt, photo, userId, username } = doc.data();
+          const { buzz, createdAt, photo, userId, username, updatedAt } =
+            doc.data();
           return {
             id: doc.id,
             buzz,
@@ -69,6 +71,7 @@ export default function Timeline({ onEdit }: TimelineProps) {
             photo,
             userId,
             username,
+            updatedAt,
           };
         });
         setBuzz(buzzs);

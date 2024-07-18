@@ -73,6 +73,8 @@ export default function Buzz({
   buzz,
   userId,
   id,
+  updatedAt,
+  createdAt,
   onEdit,
 }: BuzzProps) {
   const user = auth.currentUser;
@@ -92,7 +94,7 @@ export default function Buzz({
   };
   const handleEdit = () => {
     if (user?.uid !== userId) return;
-    onEdit({ username, photo, buzz, userId, id, createdAt: 0 }); // createdAt 임의로 추가
+    onEdit({ username, photo, buzz, userId, id, updatedAt, createdAt });
   };
   return (
     <Wrapper>
