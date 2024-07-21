@@ -1,8 +1,6 @@
 import { updateProfile } from "firebase/auth";
 import {
   collection,
-  deleteDoc,
-  doc,
   getDocs,
   limit,
   orderBy,
@@ -65,6 +63,7 @@ const EditNameInput = styled.input`
 
 const Buzzs = styled.div`
   display: flex;
+  flex:1;
   width: 100%;
   flex-direction: column;
   gap: 10px;
@@ -99,11 +98,7 @@ const AvatarCloseBtn = styled.div<HoverContentProps>`
   }
 `;
 
-interface ProfileProps {
-  onEdit: (buzz: IBuzz) => void;
-}
-
-export default function Profile({ onEdit }: ProfileProps) {
+export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [buzz, setBuzz] = useState<IBuzz[]>([]);
@@ -275,7 +270,7 @@ export default function Profile({ onEdit }: ProfileProps) {
       )}
       <Buzzs>
         {buzz.map((e) => (
-          <Buzz key={e.id} {...e} onEdit={onEdit} />
+          <Buzz key={e.id} {...e} />
         ))}
       </Buzzs>
     </MainWrapper>

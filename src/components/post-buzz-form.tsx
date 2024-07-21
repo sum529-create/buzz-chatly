@@ -5,7 +5,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { IBuzz } from "./timeline";
@@ -47,7 +47,7 @@ const Form = styled.form`
   width: 100%;
 `;
 
-const TextArea = styled.textarea`
+export const TextArea = styled.textarea`
   border: 2px solid white;
   padding: 20px;
   border-radius: 20px;
