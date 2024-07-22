@@ -1,9 +1,14 @@
-import { deleteDoc, doc } from "firebase/firestore";
-import { deleteObject, ref } from "firebase/storage";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { IBuzz } from "./timeline";
-import { useState } from "react";
+import React, { useState } from "react";
 import { AttachFileInput, TextArea } from "./post-buzz-form";
 
 const Wrapper = styled.div`
@@ -20,6 +25,9 @@ const Column = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  &.edit_img_area {
+    justify-content: flex-end;
+  }
 `;
 
 const Photo = styled.img`
@@ -27,7 +35,7 @@ const Photo = styled.img`
   height: 100px;
   border-radius: 15px;
   margin: 0 auto;
-  &.edit_img{
+  &.edit_img {
     margin: 31px 1rem 15px;
   }
 `;
@@ -45,7 +53,7 @@ const Payload = styled.p`
 const ButtonArea = styled.div`
   display: flex;
   gap: 5px;
-  &.edit_img_btn{
+  &.edit_img_btn {
     margin: 0 auto;
   }
 `;
@@ -83,7 +91,7 @@ const NewBuzzText = styled(TextArea)`
 `;
 
 const AttachFileButton = styled.label`
-  cursor:pointer;
+  cursor: pointer;
   background-color: #1d9bf0;
   color: #fff;
   font-size: 12px;
@@ -93,10 +101,11 @@ const AttachFileButton = styled.label`
   padding: 5px 10px;
   box-sizing: border-box;
   border: 1px solid #1d9bf0;
-`
+`;
 
 interface BuzzProps extends IBuzz {
   onEdit?: (buzz: IBuzz) => void;
+  refreshData?: () => void;
 }
 
 export default function Buzz({
@@ -108,6 +117,7 @@ export default function Buzz({
   updatedAt,
   createdAt,
   onEdit,
+  refreshData,
 }: BuzzProps) {
   const [isEditFlag, setIsEditFlag] = useState(false);
   const [newBuzz, setBuzz] = useState(buzz);
@@ -132,33 +142,32 @@ export default function Buzz({
   };
   const handleEdit = () => {
     if (user?.uid !== userId) return;
-    if(onEdit)
+    if (onEdit)
       onEdit({ username, photo, buzz, userId, id, updatedAt, createdAt });
     setIsEditFlag(true);
+    setPreviewImg(photo);
+    setBuzz(buzz);
   };
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBuzz(e.target.value);
   };
   const resetImg = async () => {
-    
-    if (photo && confirm("이미지를 초기화 하시겠습니까?\n초기화 진행시 이미지가 삭제됩니다.")) {
-        // const photoRef = ref(storage, `buzz/${userId}/${id}`);
-        // await deleteObject(photoRef);
-        // const docRef = doc(db, "buzz", id);
-        // await updateDoc(docRef, {
-        //   photo: null,
-        //   updatedAt: Date.now(),
-        // });
-      setFile(null)
+    if (
+      photo &&
+      confirm(
+        "이미지를 초기화 하시겠습니까?\n초기화 진행시 이미지가 삭제됩니다."
+      )
+    ) {
+      setFile(null);
       setPreviewImg(null);
     } else {
-      alert('초기화 할 이미지가 없습니다.')
+      alert("초기화 할 이미지가 없습니다.");
     }
-
-  }
+  };
   const onCancel = () => {
-    setIsEditFlag(false)
-  }
+    setIsEditFlag(false);
+    setPreviewImg(null);
+  };
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
 
@@ -181,6 +190,49 @@ export default function Buzz({
       setFile(files[0]);
     }
   };
+  const onChangeBuzz = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("사용자가 인증되지 않았습니다.");
+      return;
+    }
+
+    if (!newBuzz) {
+      alert("수정하실 텍스트를 입력해주세요!");
+      return;
+    }
+
+    if (newBuzz.length > 180) {
+      alert("텍스트는 180자 이하로 입력해주세요.");
+      return;
+    }
+    try {
+      if (photo && !previewImg) {
+        const photoRef = ref(storage, `buzz/${userId}/${id}`);
+        await deleteObject(photoRef);
+      }
+      const docRef = doc(db, "buzz", id);
+      let url;
+      if (file) {
+        const locationRef = ref(storage, `buzz/${user.uid}/${id}`); // 파일 저장 위치를 직접 지정 할 수 있다.
+
+        const result = await uploadBytes(locationRef, file);
+        url = await getDownloadURL(result.ref);
+      }
+
+      await updateDoc(docRef, {
+        buzz: newBuzz,
+        photo: file ? url : photo && !previewImg ? null : photo,
+        updatedAt: Date.now(),
+      });
+      setBuzz("");
+      setFile(null);
+      onCancel();
+      refreshData && refreshData();
+    } catch (error) {
+      console.error("Update Buzz Error: ", error);
+    }
+  };
   return (
     <Wrapper>
       <Column>
@@ -194,21 +246,15 @@ export default function Buzz({
             value={newBuzz}
             placeholder="What is happening?!"
           />
-        ):
-        <Payload>{buzz}</Payload>
-        }
+        ) : (
+          <Payload>{buzz}</Payload>
+        )}
         {user?.uid === userId && (
           <ButtonArea>
             {isEditFlag ? (
               <>
                 <DeleteButton onClick={onCancel}>cancle</DeleteButton>
-                <AttachFileButton htmlFor="file">Edit</AttachFileButton>
-                <AttachFileInput
-                  onChange={onFileChange}
-                  type="file"
-                  id="file"
-                  accept="image/*"
-                />
+                <EditButton onClick={onChangeBuzz}>Edit</EditButton>
               </>
             ) : (
               <>
@@ -219,22 +265,33 @@ export default function Buzz({
           </ButtonArea>
         )}
       </Column>
-      {photo ? (
-        <Column>
-          {
-            isEditFlag ? (
-              <>
-                <Photo  src={previewImg as string} alt="Preview Img"  className={isEditFlag && 'edit_img'} />
-                <ButtonArea className="edit_img_btn">
-                  <DeleteButton onClick={resetImg}>reset</DeleteButton>
-                  <EditButton>Edit</EditButton>
-                </ButtonArea>
-              </>
-            )
-            :  <Photo src={photo} />
-          }
-        </Column>
-      ) : null}
+      <Column className={isEditFlag ? "edit_img_area" : ""}>
+        {isEditFlag ? (
+          <>
+            {previewImg && (
+              <Photo
+                src={previewImg as string}
+                alt="Preview Img"
+                className={isEditFlag && "edit_img"}
+              />
+            )}
+            <ButtonArea className="edit_img_btn">
+              {previewImg && (
+                <DeleteButton onClick={resetImg}>reset</DeleteButton>
+              )}
+              <AttachFileButton htmlFor="file">Edit</AttachFileButton>
+              <AttachFileInput
+                onChange={onFileChange}
+                type="file"
+                id="file"
+                accept="image/*"
+              />
+            </ButtonArea>
+          </>
+        ) : (
+          photo && <Photo src={photo} />
+        )}
+      </Column>
     </Wrapper>
   );
 }

@@ -89,7 +89,7 @@ const PreviewImg = styled.img`
   }
 `;
 
-const AttachFileInput = styled.input`
+export const AttachFileInput = styled.input`
   display: none;
 `;
 

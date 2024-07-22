@@ -22,6 +22,17 @@ import { MainWrapper } from "../components/auth-component";
 
 const AvatarUpload = styled.label`
   position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 50px;
+  }
+`;
+
+const AvatarWrapper = styled.div`
+  position: relative;
   width: 80px;
   overflow: hidden;
   height: 80px;
@@ -31,9 +42,6 @@ const AvatarUpload = styled.label`
   display: flex;
   justify-content: center;
   align-items: center;
-  svg {
-    width: 50px;
-  }
 `;
 
 const AvatarImg = styled.img`
@@ -63,7 +71,7 @@ const EditNameInput = styled.input`
 
 const Buzzs = styled.div`
   display: flex;
-  flex:1;
+  flex: 1;
   width: 100%;
   flex-direction: column;
   gap: 10px;
@@ -92,6 +100,8 @@ const AvatarCloseBtn = styled.div<HoverContentProps>`
   text-align: center;
   background: tomato;
   position: absolute;
+  z-index: 3;
+  cursor: pointer;
   animation: ${(props) => props.show && slideUp} 0.3s ease-out;
   svg {
     width: 20px;
@@ -189,54 +199,57 @@ export default function Profile() {
 
   return (
     <MainWrapper>
-      <AvatarUpload
+      <AvatarWrapper
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        htmlFor="avatar"
       >
-        <AvatarCloseBtn show={hovered} onClick={resetAvatar}>
-          <svg
-            data-slot="icon"
-            fill="none"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            ></path>
-          </svg>
-        </AvatarCloseBtn>
-        {avatar ? (
-          <AvatarImg src={avatar} />
-        ) : (
-          <svg
-            data-slot="icon"
-            fill="none"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-            ></path>
-          </svg>
+        <AvatarUpload htmlFor="avatar">
+          {avatar ? (
+            <AvatarImg src={avatar} />
+          ) : (
+            <svg
+              data-slot="icon"
+              fill="none"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+              ></path>
+            </svg>
+          )}
+        </AvatarUpload>
+        {avatar && (
+          <AvatarCloseBtn show={hovered ? true : false} onClick={resetAvatar}>
+            <svg
+              data-slot="icon"
+              fill="none"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </AvatarCloseBtn>
         )}
-      </AvatarUpload>
-      <AvatarInput
-        onChange={onAvatarChange}
-        id="avatar"
-        type="file"
-        accept="image/*"
-      />
+        <AvatarInput
+          onChange={onAvatarChange}
+          id="avatar"
+          type="file"
+          accept="image/*"
+        />
+      </AvatarWrapper>
       {!showEdit ? (
         <Name>
           {user?.displayName ?? "Anonymous"}
@@ -270,7 +283,7 @@ export default function Profile() {
       )}
       <Buzzs>
         {buzz.map((e) => (
-          <Buzz key={e.id} {...e} />
+          <Buzz key={e.id} {...e} refreshData={fetchData} />
         ))}
       </Buzzs>
     </MainWrapper>
