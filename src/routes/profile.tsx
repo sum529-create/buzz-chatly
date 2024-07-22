@@ -1,10 +1,12 @@
 import { updateProfile } from "firebase/auth";
 import {
   collection,
+  doc,
   getDocs,
   limit,
   orderBy,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import {
@@ -191,6 +193,9 @@ export default function Profile() {
       try {
         const locationRef = ref(storage, `avatars/${user?.uid}`);
         await deleteObject(locationRef);
+        await updateProfile(user, {
+          photoURL: null,
+        });
         setAvatar(null);
       } catch (error) {
         console.error(error);
