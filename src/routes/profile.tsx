@@ -117,6 +117,10 @@ export default function Profile() {
   const [showEdit, setShowEdit] = useState(false);
   const [newName, setNewName] = useState(user?.displayName);
   const [hovered, setHovered] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
+  const handleSelect = (id: string) => {
+    setSelected(id);
+  };
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (!user) return;
@@ -191,12 +195,13 @@ export default function Profile() {
     if (!user) return;
     if (confirm("아바타 이미지를 초기화 하시겠습니까?"))
       try {
+        await updateProfile(user, {
+          photoURL: "",
+        });
         const locationRef = ref(storage, `avatars/${user?.uid}`);
         await deleteObject(locationRef);
-        await updateProfile(user, {
-          photoURL: null,
-        });
-        setAvatar(null);
+        await user.reload();
+        setAvatar("");
       } catch (error) {
         console.error(error);
       }
@@ -288,7 +293,13 @@ export default function Profile() {
       )}
       <Buzzs>
         {buzz.map((e) => (
-          <Buzz key={e.id} {...e} refreshData={fetchData} />
+          <Buzz
+            key={e.id}
+            {...e}
+            refreshData={fetchData}
+            onSelect={handleSelect}
+            isSelected={e.id === selected}
+          />
         ))}
       </Buzzs>
     </MainWrapper>

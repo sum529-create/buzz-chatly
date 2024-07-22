@@ -188,7 +188,8 @@ export default function PostBuzzForm({
         docRef = doc(db, "buzz", id);
         await updateDoc(docRef, {
           buzz: newBuzz,
-          photo: photo && !previewImg && null,
+          photo:
+            photo !== undefined ? (photo && !previewImg ? null : photo) : null,
           updatedAt: Date.now(),
         });
       } else {

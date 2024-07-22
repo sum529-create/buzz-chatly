@@ -26,8 +26,13 @@ const Wrapper = styled.div`
   gap: 10px;
   flex-direction: column;
   overflow-y: scroll;
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
   flex: 1;
   width: 100%;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 interface TimelineProps {
@@ -37,6 +42,10 @@ interface TimelineProps {
 export default function Timeline({ onEdit }: TimelineProps) {
   const [buzz, setBuzz] = useState<IBuzz[]>([]);
   const [unsubscribe, setUnsubscribe] = useState<Unsubscribe | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const handleSelect = (id: string) => {
+    setSelectedId(id);
+  };
   const fetchBuzz = async () => {
     try {
       const buzzQuery = query(
@@ -96,7 +105,13 @@ export default function Timeline({ onEdit }: TimelineProps) {
   return (
     <Wrapper>
       {buzz.map((e) => (
-        <Buzz key={e.id} {...e} onEdit={onEdit} />
+        <Buzz
+          key={e.id}
+          {...e}
+          onEdit={onEdit}
+          onSelect={handleSelect}
+          isSelected={e.id === selectedId}
+        />
       ))}
     </Wrapper>
   );

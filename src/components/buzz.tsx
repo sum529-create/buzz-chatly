@@ -8,14 +8,23 @@ import {
 import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { IBuzz } from "./timeline";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AttachFileInput, TextArea } from "./post-buzz-form";
 
-const Wrapper = styled.div`
+interface IWrapper {
+  isSelected: boolean;
+  isEditFlag: boolean;
+}
+
+const Wrapper = styled.div.attrs<IWrapper>({})<IWrapper>`
   display: grid;
   grid-template-columns: 3fr 1fr;
   padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid
+    ${(props) =>
+      props.isSelected && props.isEditFlag
+        ? "tomato"
+        : "rgba(255, 255, 255, 0.5)"};
   border-radius: 15px;
   margin-bottom: 1rem;
 `;
@@ -106,6 +115,8 @@ const AttachFileButton = styled.label`
 interface BuzzProps extends IBuzz {
   onEdit?: (buzz: IBuzz) => void;
   refreshData?: () => void;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
 }
 
 export default function Buzz({
@@ -118,6 +129,8 @@ export default function Buzz({
   createdAt,
   onEdit,
   refreshData,
+  isSelected,
+  onSelect,
 }: BuzzProps) {
   const [isEditFlag, setIsEditFlag] = useState(false);
   const [newBuzz, setBuzz] = useState(buzz);
@@ -125,6 +138,12 @@ export default function Buzz({
   const [previewImg, setPreviewImg] = useState<string | ArrayBuffer | null>(
     null
   );
+  const [hidHome, setHidHome] = useState(false);
+  useEffect(() => {
+    if (location.pathname === "/") {
+      setHidHome(true);
+    }
+  }, []);
   const user = auth.currentUser;
   const onDelete = async () => {
     if (user?.uid !== userId) return;
@@ -144,11 +163,12 @@ export default function Buzz({
     if (user?.uid !== userId) return;
     if (onEdit)
       onEdit({ username, photo, buzz, userId, id, updatedAt, createdAt });
-    if (location.pathname !== "/") {
-      setIsEditFlag(true);
-      setPreviewImg(photo);
-      setBuzz(buzz);
-    }
+    onSelect(id);
+    // if (location.pathname !== "/") {
+    setIsEditFlag(true);
+    setPreviewImg(photo);
+    setBuzz(buzz);
+    // }
   };
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBuzz(e.target.value);
@@ -224,7 +244,13 @@ export default function Buzz({
 
       await updateDoc(docRef, {
         buzz: newBuzz,
-        photo: file ? url : photo && !previewImg ? null : photo,
+        photo: file
+          ? url
+          : photo !== undefined
+          ? photo && !previewImg
+            ? null
+            : photo
+          : null,
         updatedAt: Date.now(),
       });
       setBuzz("");
@@ -236,10 +262,10 @@ export default function Buzz({
     }
   };
   return (
-    <Wrapper>
+    <Wrapper isSelected={isSelected} isEditFlag={isEditFlag}>
       <Column>
         <Username>{username}</Username>
-        {isEditFlag ? (
+        {isSelected && isEditFlag && !hidHome ? (
           <NewBuzzText
             required
             rows={5}
@@ -253,7 +279,7 @@ export default function Buzz({
         )}
         {user?.uid === userId && (
           <ButtonArea>
-            {isEditFlag ? (
+            {isSelected && isEditFlag && !hidHome ? (
               <>
                 <DeleteButton onClick={onCancel}>cancle</DeleteButton>
                 <EditButton onClick={onChangeBuzz}>Edit</EditButton>
@@ -267,14 +293,18 @@ export default function Buzz({
           </ButtonArea>
         )}
       </Column>
-      <Column className={isEditFlag ? "edit_img_area" : ""}>
-        {isEditFlag ? (
+      <Column
+        className={isSelected && isEditFlag && !hidHome ? "edit_img_area" : ""}
+      >
+        {isSelected && isEditFlag && !hidHome ? (
           <>
             {previewImg && (
               <Photo
                 src={previewImg as string}
                 alt="Preview Img"
-                className={isEditFlag && "edit_img"}
+                className={
+                  isSelected && isEditFlag && !hidHome ? "edit_img" : ""
+                }
               />
             )}
             <ButtonArea className="edit_img_btn">
