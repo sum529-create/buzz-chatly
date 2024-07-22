@@ -144,9 +144,11 @@ export default function Buzz({
     if (user?.uid !== userId) return;
     if (onEdit)
       onEdit({ username, photo, buzz, userId, id, updatedAt, createdAt });
-    setIsEditFlag(true);
-    setPreviewImg(photo);
-    setBuzz(buzz);
+    if (location.pathname !== "/") {
+      setIsEditFlag(true);
+      setPreviewImg(photo);
+      setBuzz(buzz);
+    }
   };
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBuzz(e.target.value);
