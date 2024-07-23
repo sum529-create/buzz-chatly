@@ -2,12 +2,15 @@ import { updateProfile } from "firebase/auth";
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
   query,
+  setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 import {
   deleteObject,
@@ -135,6 +138,13 @@ export default function Profile() {
       await updateProfile(user, {
         photoURL: avatarUrl,
       });
+
+      const profileDocRef = doc(collection(db, "profile_images"), user.uid);
+      await setDoc(profileDocRef, {
+        hasProfileImage: true,
+        profileImageUrl: avatarUrl,
+      });
+      fetchData();
     }
   };
   const fetchData = async () => {
@@ -186,8 +196,28 @@ export default function Profile() {
       await updateProfile(user, {
         displayName: newName,
       });
+      const batch = writeBatch(db);
+
+      // 3. buzz 컬렉션에서 모든 문서의 username 업데이트
+      const buzzQuery = query(
+        collection(db, "buzz"),
+        where("userId", "==", user.uid)
+      );
+      const snapshot = await getDocs(buzzQuery);
+
+      snapshot.docs.forEach((doc) => {
+        const docRef = doc.ref;
+        batch.update(docRef, {
+          updatedAt: Date.now(),
+          username: newName,
+        });
+      });
+
+      // 4. 배치 쓰기 커밋
+      await batch.commit();
       alert("이름이 수정되었습니다.");
       setShowEdit(false);
+      fetchData();
     } catch (error) {
       console.error(error);
     }
@@ -202,12 +232,39 @@ export default function Profile() {
         });
         const locationRef = ref(storage, `avatars/${user?.uid}`);
         await deleteObject(locationRef);
+
+        const profileDocRef = doc(collection(db, "profile_images"), user.uid);
+        await setDoc(profileDocRef, {
+          hasProfileImage: false,
+          profileImageUrl: "",
+        });
+
         await user.reload();
         setAvatar("");
       } catch (error) {
         console.error(error);
       }
   };
+
+  useEffect(() => {
+    const fetchProfilePic = async () => {
+      if (!user) return;
+
+      const profileDocRef = doc(collection(db, "profile_images"), user.uid);
+      const docSnap = await getDoc(profileDocRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data?.hasProfileImage && data?.profileImageUrl) {
+          setAvatar(data.profileImageUrl);
+        } else {
+          setAvatar(""); // 기본 이미지 URL 설정 또는 비워두기
+        }
+      }
+    };
+
+    fetchProfilePic();
+  }, [user]);
 
   return (
     <MainWrapper>

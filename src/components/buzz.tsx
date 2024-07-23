@@ -1,4 +1,4 @@
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import {
   deleteObject,
   getDownloadURL,
@@ -51,7 +51,7 @@ const Photo = styled.img`
 
 const Username = styled.span`
   font-weight: 600;
-  font-size: 15px;
+  font-size: 1rem;
 `;
 
 const Payload = styled.p`
@@ -112,6 +112,48 @@ const AttachFileButton = styled.label`
   border: 1px solid #1d9bf0;
 `;
 
+const ProfileWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+`;
+
+const ProfileImageWrapper = styled.div`
+  position: relative;
+  width: 50px;
+  overflow: hidden;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #1d9bf0;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 30px;
+  }
+`;
+
+const ProfileTxtWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  flex-wrap: nowrap;
+  align-content: center;
+  gap: 5px;
+`;
+
+const BuzzTime = styled.div`
+  font-size: 12px;
+`;
+
+const ProfileImage = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+`;
+
 interface BuzzProps extends IBuzz {
   onEdit?: (buzz: IBuzz) => void;
   refreshData?: () => void;
@@ -143,6 +185,8 @@ export default function Buzz({
     null
   );
   const [hidHome, setHidHome] = useState(false);
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+
   useEffect(() => {
     if (location.pathname === "/") {
       setHidHome(true);
@@ -272,13 +316,80 @@ export default function Buzz({
       console.error("Update Buzz Error: ", error);
     }
   };
+
+  useEffect(() => {
+    const fetchProfilePic = async () => {
+      if (!userId) {
+        setProfilePic(null);
+        return;
+      }
+
+      try {
+        // Firestore에서 프로필 이미지 정보를 가져옵니다
+        const profileDocRef = doc(db, "profile_images", userId);
+        const docSnap = await getDoc(profileDocRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data?.hasProfileImage && data?.profileImageUrl) {
+            // Firestore에서 URL이 있는 경우, Firebase Storage에서 다운로드 URL을 가져옵니다
+            const locationRef = ref(storage, `avatars/${userId}`);
+            const url = await getDownloadURL(locationRef);
+            setProfilePic(url);
+          } else {
+            // 이미지가 없거나 URL이 없는 경우 기본 이미지 설정
+            setProfilePic(null);
+          }
+        } else {
+          // Firestore에 문서가 없는 경우 기본 이미지 설정
+          setProfilePic(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile picture", error);
+        // 오류가 발생한 경우 기본 이미지 설정
+        setProfilePic(null);
+      }
+    };
+
+    fetchProfilePic();
+  }, [userId, photo]);
+  const formatDate = (date: number) => {
+    const strDate = new Date(date);
+    return strDate.toLocaleDateString();
+  };
   return (
     <Wrapper
       isSelected={isSelected && isSelected}
       isEditFlag={isEditFlag && isEditFlag}
     >
       <Column>
-        <Username>{username}</Username>
+        <ProfileWrapper>
+          <ProfileImageWrapper>
+            {profilePic ? (
+              <ProfileImage src={profilePic} alt={`${username}'s profile`} />
+            ) : (
+              <svg
+                data-slot="icon"
+                fill="none"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                ></path>
+              </svg>
+            )}
+          </ProfileImageWrapper>
+          <ProfileTxtWrapper>
+            <Username>{username}</Username>
+            <BuzzTime>{formatDate(updatedAt ? updatedAt : createdAt)}</BuzzTime>
+          </ProfileTxtWrapper>
+        </ProfileWrapper>
         {isSelected && isEditFlag && !hidHome ? (
           <NewBuzzText
             required
