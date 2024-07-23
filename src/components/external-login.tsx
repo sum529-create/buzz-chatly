@@ -2,7 +2,7 @@ import {
   GithubAuthProvider,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
+  // signInWithRedirect,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -13,23 +13,25 @@ const BtnWrapper = styled.div`
   border-top: 1px solid #dfe6e9;
   padding-top: 25px;
   display: flex;
-  flex-direction: column;
   width: 100%;
   gap: 0.5rem;
+  justify-content: center;
 `;
 
 const Button = styled.span`
   background-color: #fff;
   font-weight: 500;
-  padding: 10px 20px;
+  padding: 10px;
   border-radius: 50px;
   border: 0;
   color: #000;
-  width: 100%;
+  width: 50px;
+  text-align: center;
+  /* width: 100%;
   display: flex;
   gap: 5px;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
   cursor: pointer;
 `;
 
@@ -58,11 +60,9 @@ export default function ExternalLogin() {
     <BtnWrapper>
       <Button onClick={() => onClick("google")}>
         <Logo src="/images/google-logo.svg" />
-        Continue with Google
       </Button>
       <Button onClick={() => onClick("github")}>
         <Logo src="/images/github-logo.svg" />
-        Continue with Github
       </Button>
     </BtnWrapper>
   );

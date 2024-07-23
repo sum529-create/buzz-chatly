@@ -66,7 +66,7 @@ export default function Login() {
 
   return (
     <Wrapper>
-      <Title>Login</Title>
+      <Title>Buzz 로그인</Title>
       <Form onSubmit={onSubmit}>
         <Input
           name="email"
@@ -84,16 +84,15 @@ export default function Login() {
           type="password"
           required
         />
-        <Input type="submit" value={isLoading ? "Loading..." : "Log in"} />
+        <Input type="submit" value={isLoading ? "Loading..." : "로그인"} />
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
       <Switcher>
-        Don't you remember the password?
-        <Link to="/pw-inquiry">Reset Password &rarr;</Link>
+        비밀번호를 잃어버리셨나요?
+        <Link to="/pw-inquiry">비밀번호 찾기 &rarr;</Link>
       </Switcher>
       <Switcher>
-        Don't have an account?{" "}
-        <Link to="/create-account">Create one &rarr;</Link>
+        계정이 없으신가요? <Link to="/create-account">회원가입 &rarr;</Link>
       </Switcher>
       <ExternalLogin />
     </Wrapper>

@@ -42,7 +42,7 @@ export default function PwInquiry() {
 
   return (
     <Wrapper>
-      <Title>Reset Passwords</Title>
+      <Title>비밀번호 찾기</Title>
       <Form onSubmit={handleResetPassword}>
         <Input
           name="email"
@@ -52,14 +52,11 @@ export default function PwInquiry() {
           type="email"
           required
         />
-        <Input
-          type="submit"
-          value={isLoading ? "Loading..." : "Send Passwords"}
-        />
+        <Input type="submit" value={isLoading ? "Loading..." : "확인"} />
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
       <Switcher>
-        Return Login <Link to="/Login">Login &rarr;</Link>
+        로그인창으로 <Link to="/Login">로그인 &rarr;</Link>
       </Switcher>
     </Wrapper>
   );

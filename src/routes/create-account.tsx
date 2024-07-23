@@ -73,7 +73,10 @@ export default function CreateAccount() {
 
   return (
     <Wrapper>
-      <Title>Join the Community</Title>
+      <Title>
+        {/* Join the Community */}
+        회원가입
+      </Title>
       <Form onSubmit={onSubmit}>
         <Input
           name="name"
@@ -99,14 +102,11 @@ export default function CreateAccount() {
           type="password"
           required
         />
-        <Input
-          type="submit"
-          value={isLoading ? "Loading..." : "Create Account"}
-        />
+        <Input type="submit" value={isLoading ? "Loading..." : "가입하기"} />
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
       <Switcher>
-        Already have an account? <Link to="/login">Log in &rarr;</Link>
+        이미 계정이 있으신가요? <Link to="/login">로그인 &rarr;</Link>
       </Switcher>
       <ExternalLogin />
     </Wrapper>
