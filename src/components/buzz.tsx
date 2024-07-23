@@ -146,6 +146,7 @@ const ProfileTxtWrapper = styled.div`
 
 const BuzzTime = styled.div`
   font-size: 12px;
+  color: #808e9b;
 `;
 
 const ProfileImage = styled.img`
@@ -217,12 +218,10 @@ export default function Buzz({
       onEdit({ username, photo, buzz, userId, id, updatedAt, createdAt });
     }
     onSelect(id);
-    // if (location.pathname !== "/") {
     setIsEditFlag(true);
     if (onSendEditFlag) onSendEditFlag(true);
     setPreviewImg(photo);
     setBuzz(buzz);
-    // }
   };
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBuzz(e.target.value);
@@ -387,7 +386,10 @@ export default function Buzz({
           </ProfileImageWrapper>
           <ProfileTxtWrapper>
             <Username>{username}</Username>
-            <BuzzTime>{formatDate(updatedAt ? updatedAt : createdAt)}</BuzzTime>
+            <BuzzTime>
+              {formatDate(updatedAt ? updatedAt : createdAt) +
+                (updatedAt ? " (수정됨)" : "")}
+            </BuzzTime>
           </ProfileTxtWrapper>
         </ProfileWrapper>
         {isSelected && isEditFlag && !hidHome ? (
