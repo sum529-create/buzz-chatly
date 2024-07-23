@@ -9,6 +9,9 @@ export const MainWrapper = styled.div`
   height: 100vh;
   flex-wrap: nowrap;
   align-items: center;
+  @media (max-width: 500px) {
+    padding: 50px 1rem;
+  }
 `;
 
 export const Wrapper = styled.div`

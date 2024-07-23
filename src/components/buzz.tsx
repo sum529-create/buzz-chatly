@@ -117,6 +117,8 @@ interface BuzzProps extends IBuzz {
   refreshData?: () => void;
   isSelected: boolean;
   onSelect: (id: string) => void;
+  onSendEditFlag?: (flag: boolean) => void;
+  showBuzzForm?: boolean;
 }
 
 export default function Buzz({
@@ -131,6 +133,8 @@ export default function Buzz({
   refreshData,
   isSelected,
   onSelect,
+  onSendEditFlag,
+  showBuzzForm,
 }: BuzzProps) {
   const [isEditFlag, setIsEditFlag] = useState(false);
   const [newBuzz, setBuzz] = useState(buzz);
@@ -144,6 +148,10 @@ export default function Buzz({
       setHidHome(true);
     }
   }, []);
+  useEffect(() => {
+    if (typeof showBuzzForm !== "undefined" || showBuzzForm != null)
+      setIsEditFlag(showBuzzForm);
+  }, [showBuzzForm]);
   const user = auth.currentUser;
   const onDelete = async () => {
     if (user?.uid !== userId) return;
@@ -161,11 +169,13 @@ export default function Buzz({
   };
   const handleEdit = () => {
     if (user?.uid !== userId) return;
-    if (onEdit)
+    if (onEdit) {
       onEdit({ username, photo, buzz, userId, id, updatedAt, createdAt });
+    }
     onSelect(id);
     // if (location.pathname !== "/") {
     setIsEditFlag(true);
+    if (onSendEditFlag) onSendEditFlag(true);
     setPreviewImg(photo);
     setBuzz(buzz);
     // }
@@ -188,6 +198,7 @@ export default function Buzz({
   };
   const onCancel = () => {
     setIsEditFlag(false);
+    if (onSendEditFlag) onSendEditFlag(false);
     setPreviewImg(null);
   };
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,7 +273,10 @@ export default function Buzz({
     }
   };
   return (
-    <Wrapper isSelected={isSelected} isEditFlag={isEditFlag}>
+    <Wrapper
+      isSelected={isSelected && isSelected}
+      isEditFlag={isEditFlag && isEditFlag}
+    >
       <Column>
         <Username>{username}</Username>
         {isSelected && isEditFlag && !hidHome ? (

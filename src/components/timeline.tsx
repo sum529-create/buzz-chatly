@@ -37,9 +37,15 @@ const Wrapper = styled.div`
 
 interface TimelineProps {
   onEdit: (buzz: IBuzz) => void;
+  showBuzzForm: boolean;
+  onSendEditFlag: (flag: boolean) => void;
 }
 
-export default function Timeline({ onEdit }: TimelineProps) {
+export default function Timeline({
+  onEdit,
+  showBuzzForm,
+  onSendEditFlag,
+}: TimelineProps) {
   const [buzz, setBuzz] = useState<IBuzz[]>([]);
   const [unsubscribe, setUnsubscribe] = useState<Unsubscribe | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -111,6 +117,8 @@ export default function Timeline({ onEdit }: TimelineProps) {
           onEdit={onEdit}
           onSelect={handleSelect}
           isSelected={e.id === selectedId}
+          onSendEditFlag={onSendEditFlag}
+          showBuzzForm={showBuzzForm}
         />
       ))}
     </Wrapper>

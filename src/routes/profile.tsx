@@ -95,7 +95,9 @@ interface HoverContentProps {
   show: boolean;
 }
 
-const AvatarCloseBtn = styled.div<HoverContentProps>`
+const AvatarCloseBtn = styled.div.attrs<HoverContentProps>(
+  {}
+)<HoverContentProps>`
   display: ${(props) => (props.show ? "block" : "none")};
   width: 100%;
   bottom: 0;

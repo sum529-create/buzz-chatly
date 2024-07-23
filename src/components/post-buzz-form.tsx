@@ -120,13 +120,18 @@ const EditArea = styled.div`
   }
 `;
 
-interface PostBuzzFormProps extends Partial<IBuzz> {}
+interface PostBuzzFormProps extends Partial<IBuzz> {
+  onValueChange: (value: boolean) => void;
+  editBtnFlag: boolean;
+}
 
 export default function PostBuzzForm({
   photo,
   buzz,
   id,
   userId,
+  onValueChange,
+  editBtnFlag,
 }: PostBuzzFormProps) {
   const [isLoading, setLoading] = useState(false);
   const [newBuzz, setBuzz] = useState("");
@@ -137,14 +142,26 @@ export default function PostBuzzForm({
   const [showBuzzForm, setShowBuzzForm] = useState(false);
 
   useEffect(() => {
-    if (buzz !== undefined) {
-      setBuzz(buzz);
-      setShowBuzzForm(true);
+    if (editBtnFlag) {
+      if (buzz !== undefined) {
+        setBuzz(buzz);
+      }
+      if (photo !== undefined) {
+        setPreviewImg(photo);
+      }
     }
-    if (photo !== undefined) {
-      setPreviewImg(photo);
-    }
-  }, [buzz, photo]);
+    setShowBuzzForm(editBtnFlag);
+  }, [editBtnFlag, buzz, photo]);
+
+  // useEffect(() => {
+  //   if (buzz !== undefined) {
+  //     setBuzz(buzz);
+  //     openBuzzForm();
+  //   }
+  //   if (photo !== undefined) {
+  //     setPreviewImg(photo);
+  //   }
+  // }, [buzz, photo]);
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBuzz(e.target.value);
@@ -180,7 +197,7 @@ export default function PostBuzzForm({
       let docRef;
 
       // id가 존재하면 기존 Buzz 업데이트, 그렇지 않으면 새 Buzz 추가
-      if (id) {
+      if (id && editBtnFlag) {
         if (photo && !previewImg) {
           const photoRef = ref(storage, `buzz/${userId}/${id}`);
           await deleteObject(photoRef);
@@ -215,6 +232,7 @@ export default function PostBuzzForm({
       setFile(null);
       setPreviewImg(null);
       setShowBuzzForm(false);
+      onValueChange(false);
     } catch (error) {
       console.error("error! : ", error);
     } finally {
@@ -225,10 +243,14 @@ export default function PostBuzzForm({
     setFile(null);
     setPreviewImg(null);
   };
-  const openBuzzForm = () => {
+  const openBuzzForm = (type?: string) => {
     closeImg();
     setBuzz("");
-    setShowBuzzForm((e) => !e);
+    setShowBuzzForm((e) => {
+      const newState = !e;
+      if (type !== "add") onValueChange(newState);
+      return newState;
+    });
   };
   return (
     <>
@@ -253,7 +275,7 @@ export default function PostBuzzForm({
         </div>
         {!showBuzzForm ? (
           <svg
-            onClick={openBuzzForm}
+            onClick={() => openBuzzForm("add")}
             data-slot="icon"
             fill="none"
             strokeWidth="1.5"
@@ -271,7 +293,7 @@ export default function PostBuzzForm({
           </svg>
         ) : (
           <svg
-            onClick={openBuzzForm}
+            onClick={() => openBuzzForm()}
             data-slot="icon"
             fill="none"
             strokeWidth="1.5"
@@ -333,7 +355,9 @@ export default function PostBuzzForm({
           />
           <SubmitBtn
             type="submit"
-            value={isLoading ? "Posting..." : id ? "Edit Buzz" : "Post Buzz"}
+            value={
+              isLoading ? "Posting..." : editBtnFlag ? "Edit Buzz" : "Post Buzz"
+            }
           />
         </Form>
       ) : null}
