@@ -90,12 +90,9 @@ export default function Timeline({
         return acc;
       }, {} as { [key: string]: number });
 
-      console.log(userIdCnt);
-
       const duplicateUserIds = Object.keys(userIdCnt).filter(
         (e) => userIdCnt[e]
       );
-      console.log(duplicateUserIds);
 
       const seenIds = new Set<string>();
       const duplicates = buzzs.filter((data) => {
@@ -108,8 +105,6 @@ export default function Timeline({
         }
         return false;
       });
-
-      console.log(duplicates);
 
       const profilePicPromises = duplicates.map(async (b) => {
         const { userId } = b;
