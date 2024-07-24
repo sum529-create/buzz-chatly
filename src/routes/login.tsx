@@ -39,14 +39,12 @@ export default function Login() {
       ...preVal,
       error: "",
     }));
-    console.log(email, name, password);
     if (isLoading || email === "" || password === "") {
       return;
     }
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
-      //   console.log(credentials.user);
 
       // 유저 정보 업데이트 하기
 

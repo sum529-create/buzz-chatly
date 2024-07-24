@@ -51,7 +51,6 @@ export default function CreateAccount() {
         email,
         password
       );
-      //   console.log(credentials.user);
 
       // 유저 정보 업데이트 하기
       await updateProfile(credentials.user, {

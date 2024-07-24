@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from "react";
+import { styled } from "styled-components";
 import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import {
   deleteObject,
@@ -5,10 +7,8 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { IBuzz } from "./timeline";
-import React, { useEffect, useState } from "react";
 import { AttachFileInput, TextArea } from "./post-buzz-form";
 
 interface IWrapper {
@@ -16,15 +16,16 @@ interface IWrapper {
   isEditFlag: boolean;
 }
 
-const Wrapper = styled.div.attrs<IWrapper>({})<IWrapper>`
+const Wrapper = styled.div.attrs<IWrapper>(({ isSelected, isEditFlag }) => ({
+  style: {
+    border: `1px solid ${
+      isSelected && isEditFlag ? "tomato" : "rgba(255, 255, 255, 0.5)"
+    }`,
+  },
+}))<IWrapper>`
   display: grid;
   grid-template-columns: 3fr 1fr;
   padding: 20px;
-  border: 1px solid
-    ${(props) =>
-      props.isSelected && props.isEditFlag
-        ? "tomato"
-        : "rgba(255, 255, 255, 0.5)"};
   border-radius: 15px;
   margin-bottom: 1rem;
 `;
