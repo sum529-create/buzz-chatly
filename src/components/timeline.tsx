@@ -1,15 +1,17 @@
-import { Unsubscribe } from "firebase/auth";
 import {
   collection,
-  // getDocs,
+  doc,
+  getDoc,
   limit,
   onSnapshot,
   orderBy,
   query,
+  Unsubscribe, // Import Unsubscribe from firebase/firestore
 } from "firebase/firestore";
+import { getDownloadURL, ref } from "firebase/storage";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { db } from "../firebase";
+import { db, storage } from "../firebase";
 import Buzz from "./buzz";
 
 export interface IBuzz {
@@ -21,6 +23,7 @@ export interface IBuzz {
   userId: string;
   username: string;
 }
+
 const Wrapper = styled.div`
   display: flex;
   gap: 10px;
@@ -47,67 +50,115 @@ export default function Timeline({
   onSendEditFlag,
 }: TimelineProps) {
   const [buzz, setBuzz] = useState<IBuzz[]>([]);
-  const [unsubscribe, setUnsubscribe] = useState<Unsubscribe | null>(null);
+  const [profilePic, setProfilePic] = useState<{
+    [key: string]: string | null;
+  }>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
   const handleSelect = (id: string) => {
     setSelectedId(id);
   };
-  const fetchBuzz = async () => {
-    try {
-      const buzzQuery = query(
-        // query를 지정해주고,
-        collection(db, "buzz"),
-        orderBy("createdAt", "desc"),
-        // 쿼리 호출을 줄이는것도 비용감면의 한방법이다.
-        limit(25) // 페이지네이션 추후 추가, 첫 25개만 불러오도록 설정
-      );
 
-      if (unsubscribe) {
-        unsubscribe();
-      }
-      // const spanshot = await getDocs(buzzQuery); // 문서를 불러온다.
-      // const buzzs = spanshot.docs.map((doc) => {
-      //   const { buzz, createdAt, photo, userId, username } = doc.data();
-      //   return {
-      //     id: doc.id,
-      //     buzz,
-      //     createdAt,
-      //     photo,
-      //     userId,
-      //     username,
-      //   };
-      // });
-      // onSnapshop : 특정문자나 컬렉션, 쿼리 이벤트를 감지하여, realtime으로 이벤트 콜백함수 실행, 실시간으로 반영
-      // 다만, 추가적인 비용이 청구될 수 있음
-      // 이벤트 리스너에 대한 구독은 취소해 둘것, 계속 사용 시 비용 지불됨
-      const unsub = await onSnapshot(buzzQuery, (snapshot) => {
-        const buzzs = snapshot.docs.map((doc) => {
-          const { buzz, createdAt, photo, userId, username, updatedAt } =
-            doc.data();
-          return {
-            id: doc.id,
-            buzz,
-            createdAt,
-            photo,
-            userId,
-            username,
-            updatedAt,
-          };
-        });
-        setBuzz(buzzs);
-      });
-      setUnsubscribe(() => unsub);
-    } catch (error) {
-      console.error("Failed to fetch buzz data", error);
-    }
-  };
   useEffect(() => {
-    fetchBuzz();
+    const buzzQuery = query(
+      collection(db, "buzz"),
+      orderBy("createdAt", "desc"),
+      limit(25)
+    );
+
+    // Create a subscription to Firestore updates
+    const unsub: Unsubscribe = onSnapshot(buzzQuery, async (snapshot) => {
+      const buzzs: IBuzz[] = snapshot.docs.map((doc) => {
+        const { buzz, createdAt, photo, userId, username, updatedAt } =
+          doc.data();
+        return {
+          id: doc.id,
+          buzz,
+          createdAt,
+          photo,
+          userId,
+          username,
+          updatedAt,
+        };
+      });
+      setBuzz(buzzs);
+
+      const currentProfilePicMap = { ...profilePic };
+
+      const userIdCnt: { [key: string]: number } = buzzs.reduce((acc, obj) => {
+        acc[obj.userId] = (acc[obj.userId] || 0) + 1;
+        return acc;
+      }, {} as { [key: string]: number });
+
+      console.log(userIdCnt);
+
+      const duplicateUserIds = Object.keys(userIdCnt).filter(
+        (e) => userIdCnt[e]
+      );
+      console.log(duplicateUserIds);
+
+      const seenIds = new Set<string>();
+      const duplicates = buzzs.filter((data) => {
+        if (
+          duplicateUserIds.includes(data.userId) &&
+          !seenIds.has(data.userId)
+        ) {
+          seenIds.add(data.userId);
+          return true;
+        }
+        return false;
+      });
+
+      console.log(duplicates);
+
+      const profilePicPromises = duplicates.map(async (b) => {
+        const { userId } = b;
+        if (!userId) return { userId, url: null };
+
+        if (currentProfilePicMap[userId]) {
+          return { userId, url: currentProfilePicMap[userId] };
+        }
+
+        try {
+          const profileDocRef = doc(db, "profile_images", userId);
+          const docSnap = await getDoc(profileDocRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data?.hasProfileImage && data?.profileImageUrl) {
+              const locationRef = ref(storage, `avatars/${userId}`);
+              const url = await getDownloadURL(locationRef);
+              return { userId, url };
+            }
+          }
+        } catch (error) {
+          console.error(
+            `Failed to fetch profile picture for user ${userId}`,
+            error
+          );
+        }
+
+        return { userId, url: null };
+      });
+
+      const profilePicResults = await Promise.all(profilePicPromises);
+      const profilePicMap = profilePicResults.reduce((acc, { userId, url }) => {
+        acc[userId] = url || null;
+        return acc;
+      }, {} as { [key: string]: string | null });
+
+      setProfilePic((prevProfilePic) => ({
+        ...prevProfilePic,
+        ...profilePicMap,
+      }));
+    });
+
+    // Cleanup function to unsubscribe from Firestore updates
     return () => {
-      // 유저가 로그아웃 or 다른화면에 있을 경우 굳이 이벤트를 실행 할 필요가 없기에 별도처리
-      unsubscribe && unsubscribe();
+      unsub();
     };
-  }, []);
+  }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+
   return (
     <Wrapper>
       {buzz.map((e) => (
@@ -119,6 +170,7 @@ export default function Timeline({
           isSelected={e.id === selectedId}
           onSendEditFlag={onSendEditFlag}
           showBuzzForm={showBuzzForm}
+          profilePic={profilePic[e.userId] || ""}
         />
       ))}
     </Wrapper>

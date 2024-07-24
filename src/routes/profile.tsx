@@ -95,13 +95,13 @@ const slideUp = keyframes`
 `;
 
 interface HoverContentProps {
-  show: boolean;
+  $show: boolean;
 }
 
 const AvatarCloseBtn = styled.div.attrs<HoverContentProps>(
   {}
 )<HoverContentProps>`
-  display: ${(props) => (props.show ? "block" : "none")};
+  display: ${(props) => (props.$show ? "block" : "none")};
   width: 100%;
   bottom: 0;
   text-align: center;
@@ -109,7 +109,7 @@ const AvatarCloseBtn = styled.div.attrs<HoverContentProps>(
   position: absolute;
   z-index: 3;
   cursor: pointer;
-  animation: ${(props) => props.show && slideUp} 0.3s ease-out;
+  animation: ${(props) => props.$show && slideUp} 0.3s ease-out;
   svg {
     width: 20px;
   }
@@ -123,6 +123,7 @@ export default function Profile() {
   const [newName, setNewName] = useState(user?.displayName);
   const [hovered, setHovered] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [profilePic, setProfilePic] = useState<string | null>(null);
   const handleSelect = (id: string) => {
     setSelected(id);
   };
@@ -177,6 +178,39 @@ export default function Profile() {
   };
 
   useEffect(() => {
+    const fetchProfilePic = async () => {
+      if (!user?.uid) {
+        setProfilePic(null);
+        return;
+      }
+
+      try {
+        // Firestore에서 프로필 이미지 정보를 가져옵니다
+        const profileDocRef = doc(db, "profile_images", user?.uid);
+        const docSnap = await getDoc(profileDocRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data?.hasProfileImage && data?.profileImageUrl) {
+            const locationRef = ref(storage, `avatars/${user?.uid}`);
+            const url = await getDownloadURL(locationRef);
+            setProfilePic(url);
+          } else {
+            // 이미지가 없거나 URL이 없는 경우 기본 이미지 설정
+            setProfilePic(null);
+          }
+        } else {
+          // Firestore에 문서가 없는 경우 기본 이미지 설정
+          setProfilePic(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile picture", error);
+        // 오류가 발생한 경우 기본 이미지 설정
+        setProfilePic(null);
+      }
+    };
+
+    fetchProfilePic();
     fetchData();
   }, []);
 
@@ -246,26 +280,6 @@ export default function Profile() {
       }
   };
 
-  useEffect(() => {
-    const fetchProfilePic = async () => {
-      if (!user) return;
-
-      const profileDocRef = doc(collection(db, "profile_images"), user.uid);
-      const docSnap = await getDoc(profileDocRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data?.hasProfileImage && data?.profileImageUrl) {
-          setAvatar(data.profileImageUrl);
-        } else {
-          setAvatar(""); // 기본 이미지 URL 설정 또는 비워두기
-        }
-      }
-    };
-
-    fetchProfilePic();
-  }, [user]);
-
   return (
     <MainWrapper>
       <AvatarWrapper
@@ -294,7 +308,7 @@ export default function Profile() {
           )}
         </AvatarUpload>
         {avatar && (
-          <AvatarCloseBtn show={hovered ? true : false} onClick={resetAvatar}>
+          <AvatarCloseBtn $show={hovered ? true : false} onClick={resetAvatar}>
             <svg
               data-slot="icon"
               fill="none"
@@ -358,6 +372,7 @@ export default function Profile() {
             refreshData={fetchData}
             onSelect={handleSelect}
             isSelected={e.id === selected}
+            profilePic={profilePic}
           />
         ))}
       </Buzzs>

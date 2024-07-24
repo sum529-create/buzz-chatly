@@ -12,14 +12,14 @@ import { IBuzz } from "./timeline";
 import { AttachFileInput, TextArea } from "./post-buzz-form";
 
 interface IWrapper {
-  isSelected: boolean;
-  isEditFlag: boolean;
+  $isSelected: boolean;
+  $isEditFlag: boolean;
 }
 
-const Wrapper = styled.div.attrs<IWrapper>(({ isSelected, isEditFlag }) => ({
+const Wrapper = styled.div.attrs<IWrapper>(({ $isSelected, $isEditFlag }) => ({
   style: {
     border: `1px solid ${
-      isSelected && isEditFlag ? "tomato" : "rgba(255, 255, 255, 0.5)"
+      $isSelected && $isEditFlag ? "tomato" : "rgba(255, 255, 255, 0.5)"
     }`,
   },
 }))<IWrapper>`
@@ -163,6 +163,7 @@ interface BuzzProps extends IBuzz {
   onSelect: (id: string) => void;
   onSendEditFlag?: (flag: boolean) => void;
   showBuzzForm?: boolean;
+  profilePic?: string | null;
 }
 
 export default function Buzz({
@@ -179,6 +180,7 @@ export default function Buzz({
   onSelect,
   onSendEditFlag,
   showBuzzForm,
+  profilePic, // 프로필 이미지를 props로 받아옵니다
 }: BuzzProps) {
   const [isEditFlag, setIsEditFlag] = useState(false);
   const [newBuzz, setBuzz] = useState(buzz);
@@ -187,7 +189,6 @@ export default function Buzz({
     null
   );
   const [hidHome, setHidHome] = useState(false);
-  const [profilePic, setProfilePic] = useState<string | null>(null);
 
   useEffect(() => {
     if (location.pathname === "/") {
@@ -198,7 +199,9 @@ export default function Buzz({
     if (typeof showBuzzForm !== "undefined" || showBuzzForm != null)
       setIsEditFlag(showBuzzForm);
   }, [showBuzzForm]);
+
   const user = auth.currentUser;
+
   const onDelete = async () => {
     if (user?.uid !== userId) return;
     if (confirm("해당 버즈를 삭제하시겠습니까?")) {
@@ -213,6 +216,7 @@ export default function Buzz({
       }
     }
   };
+
   const handleEdit = () => {
     if (user?.uid !== userId) return;
     if (onEdit) {
@@ -224,9 +228,11 @@ export default function Buzz({
     setPreviewImg(photo);
     setBuzz(buzz);
   };
+
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBuzz(e.target.value);
   };
+
   const resetImg = async () => {
     if (
       photo &&
@@ -240,14 +246,15 @@ export default function Buzz({
       alert("초기화 할 이미지가 없습니다.");
     }
   };
+
   const onCancel = () => {
     setIsEditFlag(false);
     if (onSendEditFlag) onSendEditFlag(false);
     setPreviewImg(null);
   };
+
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
-
     if (files && files.length === 1) {
       const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB
       if (files[0].size > MAX_FILE_SIZE) {
@@ -257,28 +264,25 @@ export default function Buzz({
         e.target.value = "";
         return;
       }
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImg(reader.result);
       };
       reader.readAsDataURL(files[0]);
-
       setFile(files[0]);
     }
   };
+
   const onChangeBuzz = async () => {
     const user = auth.currentUser;
     if (!user) {
       alert("사용자가 인증되지 않았습니다.");
       return;
     }
-
     if (!newBuzz) {
       alert("수정하실 텍스트를 입력해주세요!");
       return;
     }
-
     if (newBuzz.length > 180) {
       alert("텍스트는 180자 이하로 입력해주세요.");
       return;
@@ -291,12 +295,10 @@ export default function Buzz({
       const docRef = doc(db, "buzz", id);
       let url;
       if (file) {
-        const locationRef = ref(storage, `buzz/${user.uid}/${id}`); // 파일 저장 위치를 직접 지정 할 수 있다.
-
+        const locationRef = ref(storage, `buzz/${user.uid}/${id}`);
         const result = await uploadBytes(locationRef, file);
         url = await getDownloadURL(result.ref);
       }
-
       await updateDoc(docRef, {
         buzz: newBuzz,
         photo: file
@@ -317,50 +319,15 @@ export default function Buzz({
     }
   };
 
-  useEffect(() => {
-    const fetchProfilePic = async () => {
-      if (!userId) {
-        setProfilePic(null);
-        return;
-      }
-
-      try {
-        // Firestore에서 프로필 이미지 정보를 가져옵니다
-        const profileDocRef = doc(db, "profile_images", userId);
-        const docSnap = await getDoc(profileDocRef);
-
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data?.hasProfileImage && data?.profileImageUrl) {
-            // Firestore에서 URL이 있는 경우, Firebase Storage에서 다운로드 URL을 가져옵니다
-            const locationRef = ref(storage, `avatars/${userId}`);
-            const url = await getDownloadURL(locationRef);
-            setProfilePic(url);
-          } else {
-            // 이미지가 없거나 URL이 없는 경우 기본 이미지 설정
-            setProfilePic(null);
-          }
-        } else {
-          // Firestore에 문서가 없는 경우 기본 이미지 설정
-          setProfilePic(null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch profile picture", error);
-        // 오류가 발생한 경우 기본 이미지 설정
-        setProfilePic(null);
-      }
-    };
-
-    fetchProfilePic();
-  }, [userId, photo]);
   const formatDate = (date: number) => {
     const strDate = new Date(date);
     return strDate.toLocaleDateString();
   };
+
   return (
     <Wrapper
-      isSelected={isSelected && isSelected}
-      isEditFlag={isEditFlag && isEditFlag}
+      $isSelected={isSelected && isSelected}
+      $isEditFlag={isEditFlag && isEditFlag}
     >
       <Column>
         <ProfileWrapper>
