@@ -11,6 +11,7 @@ import LoadingScreen from "./components/loading-screen";
 import { auth } from "./firebase";
 import ProtectedRoute from "./components/protected-route";
 import PwInquiry from "./routes/pw-inquiry";
+import Info from "./routes/info";
 
 const GlobalStyles = createGlobalStyle`
   ${reset};
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
   {
     path: "pw-inquiry",
     element: <PwInquiry />,
+  },
+  {
+    path: "/info",
+    element: <Info />,
   },
 ]);
 

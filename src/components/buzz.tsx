@@ -49,12 +49,12 @@ const Photo = styled.img`
   }
 `;
 
-const Username = styled.span`
+export const Username = styled.span`
   font-weight: 600;
   font-size: 1rem;
 `;
 
-const Payload = styled.p`
+export const Payload = styled.p`
   margin: 10px 0px;
   font-size: 18px;
 `;
@@ -112,14 +112,14 @@ const AttachFileButton = styled.label`
   border: 1px solid #1d9bf0;
 `;
 
-const ProfileWrapper = styled.div`
+export const ProfileWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
 `;
 
-const ProfileImageWrapper = styled.div`
+export const ProfileImageWrapper = styled.div`
   position: relative;
   width: 50px;
   overflow: hidden;
@@ -135,7 +135,7 @@ const ProfileImageWrapper = styled.div`
   }
 `;
 
-const ProfileTxtWrapper = styled.div`
+export const ProfileTxtWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: left;
@@ -144,7 +144,7 @@ const ProfileTxtWrapper = styled.div`
   gap: 5px;
 `;
 
-const BuzzTime = styled.div`
+export const BuzzTime = styled.div`
   font-size: 12px;
   color: #808e9b;
 `;

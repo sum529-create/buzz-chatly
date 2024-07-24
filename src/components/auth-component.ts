@@ -22,7 +22,7 @@ export const Wrapper = styled.div`
   justify-content: center;
   width: 90%;
   max-width: 420px;
-  padding: 50px 0px;
+  padding: 125px 0px 50px 0px;
   margin: auto;
 
   @media (max-width: 768px) {

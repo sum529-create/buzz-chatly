@@ -66,13 +66,13 @@ export default function Login() {
 
   return (
     <Wrapper>
-      <Title>Buzz 로그인</Title>
+      <Title>Buzz Chatly</Title>
       <Form onSubmit={onSubmit}>
         <Input
           name="email"
           value={email}
           onChange={handleChange}
-          placeholder="Email"
+          placeholder="이메일"
           type="email"
           required
         />
@@ -80,7 +80,7 @@ export default function Login() {
           name="password"
           value={password}
           onChange={handleChange}
-          placeholder="Password"
+          placeholder="비밀번호"
           type="password"
           required
         />
@@ -88,11 +88,11 @@ export default function Login() {
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
       <Switcher>
-        비밀번호를 잃어버리셨나요?
+        비밀번호를 잊으셨나요?
         <Link to="/pw-inquiry">비밀번호 찾기 &rarr;</Link>
       </Switcher>
       <Switcher>
-        계정이 없으신가요? <Link to="/create-account">회원가입 &rarr;</Link>
+        계정이 없으신가요? <Link to="/create-account">가입하기 &rarr;</Link>
       </Switcher>
       <ExternalLogin />
     </Wrapper>
