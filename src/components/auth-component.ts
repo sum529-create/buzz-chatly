@@ -2,15 +2,15 @@ import styled from "styled-components";
 
 export const MainWrapper = styled.div`
   position: relative;
-  padding: 50px 3rem;
+  padding: 0 2rem;
   display: flex;
   gap: 1rem;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 142px);
   flex-wrap: nowrap;
   align-items: center;
   @media (max-width: 500px) {
-    padding: 50px 1rem;
+    padding: 0 1rem;
   }
 `;
 

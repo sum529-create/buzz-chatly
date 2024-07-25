@@ -39,21 +39,30 @@ const FormTitle = styled.div`
   }
 `;
 
-const Form = styled.form`
+const Form = styled.form<{ $isFocused: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 10px;
   position: relative;
   width: 100%;
+  background-color: black;
+  border-radius: 20px;
+  border: 2px solid white;
+  ${({ $isFocused }) =>
+    $isFocused &&
+    `
+    border-color: #78e08f;
+  `}
 `;
 
 export const TextArea = styled.textarea`
-  border: 2px solid white;
-  padding: 20px;
-  border-radius: 20px;
+  border: 1px solid transparent;
+  height: 66px;
+  padding: 10px;
+  line-height: 1.5;
   font-size: 16px;
   color: white;
-  background-color: black;
+  background-color: transparent;
   width: 100%;
   resize: none;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -63,19 +72,28 @@ export const TextArea = styled.textarea`
   }
   &:focus {
     outline: none;
-    border-color: #1d9bf0;
   }
 `;
 
+const PostIconWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
 const AttachFileButton = styled.label`
-  padding: 10px 0px;
-  color: #1d9bf0;
+  color: #2bcbba;
   text-align: center;
   border-radius: 20px;
-  border: 1px solid #1d9bf0;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  svg {
+    width: 30px;
+  }
 `;
 
 const PreviewImg = styled.img`
@@ -94,13 +112,18 @@ export const AttachFileInput = styled.input`
 `;
 
 const SubmitBtn = styled.input`
-  background-color: #1d9bf0;
+  background-color: #0fb9b1;
   color: white;
-  border: none;
-  padding: 10px 0px;
+  padding: 0 19px;
   border-radius: 20px;
   font-size: 16px;
   cursor: pointer;
+  min-width: 75px;
+  line-height: 36px;
+  height: 36px;
+  vertical-align: top;
+  text-align: center;
+  border: 1px solid #0fb9b1;
   &:hover,
   &:active {
     opacity: 0.9;
@@ -140,6 +163,7 @@ export default function PostBuzzForm({
     null
   );
   const [showBuzzForm, setShowBuzzForm] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     if (editBtnFlag) {
@@ -312,7 +336,7 @@ export default function PostBuzzForm({
         )}
       </FormTitle>
       {showBuzzForm ? (
-        <Form onSubmit={onSubmit}>
+        <Form onSubmit={onSubmit} $isFocused={isFocused}>
           <TextArea
             required
             rows={5}
@@ -320,6 +344,8 @@ export default function PostBuzzForm({
             onChange={onChange}
             value={newBuzz}
             placeholder="What is happening?!"
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
           />
           {previewImg && (
             <>
@@ -344,21 +370,39 @@ export default function PostBuzzForm({
               <PreviewImg src={previewImg as string} alt="Preview Img" />
             </>
           )}
-          <AttachFileButton htmlFor="file">
-            {file ? "Photo added ✅" : "Add photo"}
-          </AttachFileButton>
-          <AttachFileInput
-            onChange={onFileChange}
-            type="file"
-            id="file"
-            accept="image/*"
-          />
-          <SubmitBtn
-            type="submit"
-            value={
-              isLoading ? "Posting..." : editBtnFlag ? "Edit Buzz" : "Post Buzz"
-            }
-          />
+          <PostIconWrapper>
+            <AttachFileButton htmlFor="file">
+              {file ? (
+                "Photo added ✅"
+              ) : (
+                <svg
+                  data-slot="icon"
+                  fill="none"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                  ></path>
+                </svg>
+              )}
+            </AttachFileButton>
+            <AttachFileInput
+              onChange={onFileChange}
+              type="file"
+              id="file"
+              accept="image/*"
+            />
+            <SubmitBtn
+              type="submit"
+              value={isLoading ? "Posting..." : editBtnFlag ? "수정" : "게시"}
+            />
+          </PostIconWrapper>
         </Form>
       ) : null}
     </>

@@ -3,24 +3,36 @@ import { styled } from "styled-components";
 import { auth } from "../firebase";
 
 const Wrapper = styled.div`
-  display: grid;
+  /* display: grid; */
   /* gap: 20px; */
-  grid-template-columns: 1fr 5fr;
+  /* grid-template-columns: 1fr 5fr; */
+  display: flex;
+  flex-direction: column;
   height: 100%;
   /* padding: 50px 0px; */
   width: 100%;
   max-width: 860px;
 `;
-
-const Menu = styled.div`
+const BottomMenu = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  width: 768px;
   gap: 20px;
   background-color: #222f3e;
   padding: 1rem 0;
+  position: fixed;
+  bottom: 0;
+  justify-content: space-evenly;
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: 100%;
+  }
+`;
+
+const TopMenu = styled(BottomMenu)`
+  top: 0;
   position: relative;
-  height: 100vh;
 `;
 
 const MenuItem = styled.div`
@@ -29,8 +41,8 @@ const MenuItem = styled.div`
   align-items: center;
   justify-content: center;
   border: 2px solid #e0e0e0;
-  height: 50px;
-  width: 50px;
+  height: 40px;
+  width: 40px;
   border-radius: 50%;
   svg {
     width: 30px;
@@ -43,7 +55,7 @@ const MenuItem = styled.div`
     }
   }
   img {
-    width: 50px;
+    width: 40px;
   }
   &.logo {
     border: none;
@@ -68,12 +80,15 @@ export default function Layout() {
   };
   return (
     <Wrapper>
-      <Menu>
+      <TopMenu>
         <Link to="/">
           <MenuItem className="logo">
             <img src="/images/logo.png" alt="buzz chatly logo" />
           </MenuItem>
         </Link>
+      </TopMenu>
+      <Outlet />
+      <BottomMenu>
         <Link to="/">
           <MenuItem>
             <svg
@@ -121,8 +136,7 @@ export default function Layout() {
             />
           </svg>
         </MenuItem>
-      </Menu>
-      <Outlet />
+      </BottomMenu>
     </Wrapper>
   );
 }

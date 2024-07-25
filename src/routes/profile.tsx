@@ -22,7 +22,7 @@ import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { IBuzz } from "../components/timeline";
-import Buzz, { DeleteButton, EditButton } from "../components/buzz";
+import Buzz, { IconButton } from "../components/buzz";
 import { MainWrapper } from "../components/auth-component";
 
 const AvatarUpload = styled.label`
@@ -42,7 +42,7 @@ const AvatarWrapper = styled.div`
   overflow: hidden;
   height: 80px;
   border-radius: 50%;
-  background-color: #1d9bf0;
+  background-color: #079992;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -212,7 +212,7 @@ export default function Profile() {
 
     fetchProfilePic();
     fetchData();
-  }, []);
+  }, [avatar]);
 
   const showInput = () => {
     setShowEdit((e) => !e);
@@ -275,6 +275,7 @@ export default function Profile() {
 
         await user.reload();
         setAvatar("");
+        fetchData();
       } catch (error) {
         console.error(error);
       }
@@ -360,8 +361,8 @@ export default function Profile() {
             value={newName ? newName : ""}
             type="text"
           />
-          <EditButton onClick={changeEditName}>확인</EditButton>
-          <DeleteButton onClick={() => setShowEdit(false)}>취소</DeleteButton>
+          <IconButton onClick={changeEditName}>확인</IconButton>
+          <IconButton onClick={() => setShowEdit(false)}>취소</IconButton>
         </Name>
       )}
       <Buzzs>
