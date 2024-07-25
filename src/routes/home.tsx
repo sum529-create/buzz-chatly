@@ -21,12 +21,16 @@ export default function Home() {
       <PostBuzzForm
         {...(selectedBuzz || {})}
         editBtnFlag={showBuzzForm}
-        onValueChange={handleValueChange}
+        onValueChange={(value) => {
+          setTimeout(() => handleValueChange(value), 0);
+        }}
       />
       <Timeline
         onEdit={handleEdit}
         showBuzzForm={showBuzzForm}
-        onSendEditFlag={onSendEditFlag}
+        onSendEditFlag={(flag) => {
+          setTimeout(() => onSendEditFlag(flag), 0);
+        }}
       />
     </MainWrapper>
   );
