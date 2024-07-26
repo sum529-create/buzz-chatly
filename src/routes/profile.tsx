@@ -22,8 +22,13 @@ import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { IBuzz } from "../components/timeline";
-import Buzz, { IconButton } from "../components/buzz";
+import Buzz from "../components/buzz";
 import { MainWrapper } from "../components/auth-component";
+import {
+  DeleteButton,
+  EditButton,
+  IconButton,
+} from "../components/common-component";
 
 const AvatarUpload = styled.label`
   position: relative;
@@ -81,6 +86,8 @@ const Buzzs = styled.div`
   flex-direction: column;
   gap: 10px;
   overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `;
 
 const slideUp = keyframes`
@@ -361,8 +368,8 @@ export default function Profile() {
             value={newName ? newName : ""}
             type="text"
           />
-          <IconButton onClick={changeEditName}>확인</IconButton>
-          <IconButton onClick={() => setShowEdit(false)}>취소</IconButton>
+          <EditButton onClick={changeEditName}>수정</EditButton>
+          <DeleteButton onClick={() => setShowEdit(false)}>취소</DeleteButton>
         </Name>
       )}
       <Buzzs>

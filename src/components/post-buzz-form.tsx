@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import {
   deleteObject,
   getDownloadURL,
@@ -8,6 +8,16 @@ import {
 import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
+import {
+  ButtonArea,
+  DeleteButton,
+  EditButton,
+  ProfileImage,
+  ProfileImageWrapper,
+  ProfileTxtWrapper,
+  ProfileWrapper,
+  Username,
+} from "./common-component";
 import { IBuzz } from "./timeline";
 
 const FormTitle = styled.div`
@@ -45,6 +55,7 @@ const Form = styled.form<{ $isFocused: boolean }>`
   gap: 10px;
   position: relative;
   width: 100%;
+  padding: 10px 20px;
   background-color: black;
   border-radius: 20px;
   border: 2px solid white;
@@ -58,13 +69,13 @@ const Form = styled.form<{ $isFocused: boolean }>`
 export const TextArea = styled.textarea`
   border: 1px solid transparent;
   height: 66px;
-  padding: 10px;
+  padding: 10px 20px;
   line-height: 1.5;
   font-size: 16px;
   color: white;
-  background-color: transparent;
   width: 100%;
   resize: none;
+  background-color: #222;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   &::placeholder {
@@ -75,17 +86,28 @@ export const TextArea = styled.textarea`
   }
 `;
 
-const PostIconWrapper = styled.div`
+export const PostIconWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 10px 0px;
   flex-wrap: nowrap;
   align-items: center;
-  margin-bottom: 10px;
+  position: relative;
+  margin-top: 20px;
+  &::before {
+    content: "";
+    margin: 0 auto;
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 1px; /* 선의 두께 */
+    background-color: #ccc; /* 선의 색상 */
+  }
 `;
 
 const AttachFileButton = styled.label`
-  color: #2bcbba;
+  color: #55e6c1;
   text-align: center;
   border-radius: 20px;
   font-size: 14px;
@@ -111,26 +133,9 @@ export const AttachFileInput = styled.input`
   display: none;
 `;
 
-const SubmitBtn = styled.input`
-  background-color: #0fb9b1;
-  color: white;
-  padding: 0 19px;
-  border-radius: 20px;
-  font-size: 16px;
-  cursor: pointer;
-  min-width: 75px;
-  line-height: 36px;
-  height: 36px;
-  vertical-align: top;
-  text-align: center;
-  border: 1px solid #0fb9b1;
-  &:hover,
-  &:active {
-    opacity: 0.9;
-  }
-`;
+const ImageDeleteButton = styled.div``;
 
-const EditArea = styled.div`
+export const EditArea = styled.div`
   width: 100%;
   position: relative;
   svg {
@@ -152,6 +157,7 @@ export default function PostBuzzForm({
   photo,
   buzz,
   id,
+  username,
   userId,
   onValueChange,
   editBtnFlag,
@@ -162,8 +168,38 @@ export default function PostBuzzForm({
   const [previewImg, setPreviewImg] = useState<string | ArrayBuffer | null>(
     null
   );
-  const [showBuzzForm, setShowBuzzForm] = useState(false);
+  const [showBuzzForm, setShowBuzzForm] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [userNm, setUserNm] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getAvatar = async () => {
+      const user = auth.currentUser;
+      if (!user?.uid) {
+        return;
+      } else {
+        setUserNm(user?.displayName);
+      }
+      try {
+        const profileDocRef = doc(db, "profile_images", user?.uid);
+        const docSnap = await getDoc(profileDocRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data?.hasProfileImage && data?.profileImageUrl) {
+            const loactionRef = ref(storage, `avatars/${user?.uid}`);
+            const url = await getDownloadURL(loactionRef);
+            setAvatar(url);
+          }
+        } else {
+          setAvatar(null);
+        }
+      } catch (error) {
+        console.error("Fail to fetch profile picture", error);
+      }
+    };
+    getAvatar();
+  }, [id]);
 
   useEffect(() => {
     if (editBtnFlag) {
@@ -174,7 +210,7 @@ export default function PostBuzzForm({
         setPreviewImg(photo);
       }
     }
-    setShowBuzzForm(editBtnFlag);
+    // setShowBuzzForm(editBtnFlag);
   }, [editBtnFlag, buzz, photo]);
 
   // useEffect(() => {
@@ -255,7 +291,7 @@ export default function PostBuzzForm({
       setBuzz("");
       setFile(null);
       setPreviewImg(null);
-      setShowBuzzForm(false);
+      setShowBuzzForm(true);
       onValueChange(false);
     } catch (error) {
       console.error("error! : ", error);
@@ -337,6 +373,32 @@ export default function PostBuzzForm({
       </FormTitle>
       {showBuzzForm ? (
         <Form onSubmit={onSubmit} $isFocused={isFocused}>
+          <ProfileWrapper>
+            <ProfileImageWrapper>
+              {avatar ? (
+                <ProfileImage src={avatar} alt={`${userNm}'s profile`} />
+              ) : (
+                <svg
+                  data-slot="icon"
+                  fill="none"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                  ></path>
+                </svg>
+              )}
+            </ProfileImageWrapper>
+            <ProfileTxtWrapper>
+              <Username>{userNm}</Username>
+            </ProfileTxtWrapper>
+          </ProfileWrapper>
           <TextArea
             required
             rows={5}
@@ -349,9 +411,8 @@ export default function PostBuzzForm({
           />
           {previewImg && (
             <>
-              <EditArea>
+              <EditArea onClick={closeImg}>
                 <svg
-                  onClick={closeImg}
                   data-slot="icon"
                   fill="none"
                   strokeWidth="1.5"
@@ -373,7 +434,21 @@ export default function PostBuzzForm({
           <PostIconWrapper>
             <AttachFileButton htmlFor="file">
               {file ? (
-                "Photo added ✅"
+                <svg
+                  data-slot="icon"
+                  fill="none"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                  ></path>
+                </svg>
               ) : (
                 <svg
                   data-slot="icon"
@@ -398,10 +473,33 @@ export default function PostBuzzForm({
               id="file"
               accept="image/*"
             />
-            <SubmitBtn
-              type="submit"
-              value={isLoading ? "Posting..." : editBtnFlag ? "수정" : "게시"}
-            />
+            {previewImg && (
+              <ImageDeleteButton onClick={closeImg}>
+                <svg
+                  data-slot="icon"
+                  fill="none"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </ImageDeleteButton>
+            )}
+            <ButtonArea>
+              <EditButton type="submit">
+                {isLoading ? "Posting..." : editBtnFlag ? "수정" : "게시"}
+              </EditButton>
+              {editBtnFlag && (
+                <DeleteButton onClick={() => openBuzzForm()}>취소</DeleteButton>
+              )}
+            </ButtonArea>
           </PostIconWrapper>
         </Form>
       ) : null}

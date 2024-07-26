@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MainWrapper } from "../components/auth-component";
 import PostBuzzForm from "../components/post-buzz-form";
 import Timeline, { IBuzz } from "../components/timeline";
@@ -19,19 +19,21 @@ export default function Home() {
   return (
     <MainWrapper>
       <PostBuzzForm
-        {...(selectedBuzz || {})}
+        {...selectedBuzz}
         editBtnFlag={showBuzzForm}
         onValueChange={(value) => {
           setTimeout(() => handleValueChange(value), 0);
         }}
       />
-      <Timeline
-        onEdit={handleEdit}
-        showBuzzForm={showBuzzForm}
-        onSendEditFlag={(flag) => {
-          setTimeout(() => onSendEditFlag(flag), 0);
-        }}
-      />
+      {!showBuzzForm && (
+        <Timeline
+          onEdit={handleEdit}
+          showBuzzForm={showBuzzForm}
+          onSendEditFlag={(flag) => {
+            setTimeout(() => onSendEditFlag(flag), 0);
+          }}
+        />
+      )}
     </MainWrapper>
   );
 }

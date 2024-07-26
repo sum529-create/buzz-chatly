@@ -9,7 +9,7 @@ import {
   ProfileTxtWrapper,
   ProfileWrapper,
   Username,
-} from "../components/buzz";
+} from "../components/common-component";
 
 // 부모 컨테이너 스타일 정의
 const Container = styled.div`
