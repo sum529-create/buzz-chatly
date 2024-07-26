@@ -2,11 +2,11 @@ import styled from "styled-components";
 
 export const MainWrapper = styled.div`
   position: relative;
-  padding: 0 2rem;
+  padding: 10px 2rem;
   display: flex;
   gap: 1rem;
   flex-direction: column;
-  height: calc(100vh - 142px);
+  height: calc(100vh - 100px);
   flex-wrap: nowrap;
   align-items: center;
   @media (max-width: 500px) {

@@ -20,7 +20,7 @@ const BottomMenu = styled.div`
   width: 768px;
   gap: 20px;
   background-color: #222f3e;
-  padding: 1rem 0;
+  padding: 5px 0;
   position: fixed;
   bottom: 0;
   justify-content: space-evenly;

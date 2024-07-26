@@ -11,9 +11,9 @@ export const ProfileWrapper = styled.div`
 
 export const ProfileImageWrapper = styled.div`
   position: relative;
-  width: 50px;
+  width: 45px;
+  height: 45px;
   overflow: hidden;
-  height: 50px;
   border-radius: 50%;
   background-color: #079992;
   cursor: pointer;
@@ -26,8 +26,8 @@ export const ProfileImageWrapper = styled.div`
 `;
 
 export const ProfileImage = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
 `;
 
@@ -48,7 +48,7 @@ export const IconUsernameWrapper = styled.div`
 
 export const Username = styled.span`
   font-weight: 600;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 28px;
 `;
 

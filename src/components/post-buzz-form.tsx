@@ -27,15 +27,15 @@ const FormTitle = styled.div`
   align-items: center;
   width: 100%;
   svg {
-    width: 34px;
+    width: 24px;
   }
   .title-wrapper {
-    font-size: 2rem;
+    font-size: 1.5rem;
     display: flex;
     gap: 4px;
     justify-content: flex-start;
     flex-wrap: nowrap;
-    align-items: flex-start;
+    align-items: center;
   }
   .buzz_flag_btn {
     cursor: pointer;
