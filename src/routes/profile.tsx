@@ -28,6 +28,7 @@ import {
   DeleteButton,
   EditButton,
   IconButton,
+  ProfileImageWrapper,
 } from "../components/common-component";
 
 const AvatarUpload = styled.label`
@@ -41,17 +42,9 @@ const AvatarUpload = styled.label`
   }
 `;
 
-const AvatarWrapper = styled.div`
-  position: relative;
+const AvatarWrapper = styled(ProfileImageWrapper)`
   width: 80px;
-  overflow: hidden;
   height: 80px;
-  border-radius: 50%;
-  background-color: #079992;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const AvatarImg = styled.img`

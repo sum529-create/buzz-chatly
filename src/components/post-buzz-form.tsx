@@ -374,7 +374,9 @@ export default function PostBuzzForm({
       {showBuzzForm ? (
         <Form onSubmit={onSubmit} $isFocused={isFocused}>
           <ProfileWrapper>
-            <ProfileImageWrapper>
+            <ProfileImageWrapper
+              className={avatar ? "bg-transparent" : "bg-colored"}
+            >
               {avatar ? (
                 <ProfileImage src={avatar} alt={`${userNm}'s profile`} />
               ) : (
