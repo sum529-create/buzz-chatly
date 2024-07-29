@@ -287,6 +287,7 @@ export default function Profile() {
       <AvatarWrapper
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        className={avatar ? "bg-transparent" : "bg-colored"}
       >
         <AvatarUpload htmlFor="avatar">
           {avatar ? (
