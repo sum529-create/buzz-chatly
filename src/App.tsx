@@ -66,7 +66,6 @@ const router = createBrowserRouter([
 const Wrapper = styled.div`
   /* height: 100vh; */
   display: flex;
-  justify-content: flex-start;
   width: 48rem; // 768px
   margin: 0 auto;
   background-color: #1e272e;

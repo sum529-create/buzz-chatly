@@ -11,18 +11,29 @@ import {
   Username,
 } from "../components/common-component";
 
+const InfoWrapepr = styled(MainWrapper)`
+  height: 100vh;
+  justify-content: center;
+  @media (max-width: 768px) {
+    height: auto;
+  }
+`;
+
 // 부모 컨테이너 스타일 정의
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   flex-direction: column;
   width: 100%;
   position: relative;
   overflow: hidden;
+  gap: 200px;
+  padding: 100px 0;
   @media (min-width: 768px) {
+    gap: 5px;
     flex-direction: row;
+    padding: 0;
   }
 `;
 
@@ -34,10 +45,11 @@ const TextColumn = styled.div`
   align-items: center;
   font-size: 24px;
   text-align: center;
-  height: 66.67vh; /* 2/3 of viewport height */
+  height: 100%;
   width: 100%;
 
   @media (min-width: 768px) {
+    height: 66.67vh; /* 2/3 of viewport height */
     width: 50%;
   }
 `;
@@ -116,6 +128,9 @@ const ScrollingText = styled.div<{ delay: number }>`
   flex-direction: column;
   text-align: left;
   align-items: flex-start;
+  @media (max-width: 768px) {
+    height: 15vh;
+  }
 `;
 
 // 버튼 스타일 정의
@@ -161,10 +176,12 @@ const InfoProfileTxtWrapper = styled(ProfileTxtWrapper)`
 
 const InfoUsername = styled(Username)`
   font-size: 14px;
+  line-height: 14px;
 `;
 
 const InfoBuzzTime = styled(BuzzTime)`
   font-size: 10px;
+  line-height: 10px;
 `;
 
 const InfoPayload = styled(Payload)`
@@ -221,7 +238,7 @@ const messages = [
 
 export default function Info() {
   return (
-    <MainWrapper>
+    <InfoWrapepr>
       <Container>
         <TextColumn>
           <PhoneFrame>
@@ -326,6 +343,6 @@ export default function Info() {
           </SmallText>
         </TextColumn>
       </Container>
-    </MainWrapper>
+    </InfoWrapepr>
   );
 }

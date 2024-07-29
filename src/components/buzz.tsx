@@ -42,7 +42,7 @@ const Wrapper = styled.div.attrs<IWrapper>(({ $isSelected, $isEditFlag }) => ({
     }`,
     boxShadow: `${
       $isSelected && $isEditFlag
-        ? "0 0 5px rgba(50, 255, 170, 0.5), 0 0 10px rgba(50, 255, 170, 0.5), 0 0 20px rgba(50, 255, 170, 0.5), 0 0 40px rgba(50, 255, 170, 0.5)"
+        ? "0 0 5px rgba(50, 255, 170, 0.5), 0 0 10px rgba(50, 255, 170, 0.5), 0 0 15px rgba(50, 255, 170, 0.5), 0 0 20px rgba(50, 255, 170, 0.5)"
         : "none"
     }`,
     backgroundColor: `${$isSelected && $isEditFlag && "black"}`,
@@ -63,16 +63,24 @@ const Column = styled.div`
   justify-content: center;
 `;
 
+const ImageColumn = styled(Column)`
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+`;
+
 const NewBuzzText = styled(TextArea)`
   height: 100px;
   margin: 1rem 0;
 `;
 
 const Photo = styled.img`
-  width: 100px;
-  height: 100px;
-  border-radius: 15px;
+  width: 100%;
+  max-width: 600px;
   margin: 0 auto;
+  overflow: hidden;
+  border-radius: 15px;
+  position: relative;
   &.edit_img {
   }
 `;
@@ -257,7 +265,9 @@ export default function Buzz({
     >
       <Column>
         <ProfileWrapper>
-          <ProfileImageWrapper>
+          <ProfileImageWrapper
+            className={profilePic ? "bg-transparent" : "bg-colored"}
+          >
             {profilePic ? (
               <ProfileImage src={profilePic} alt={`${username}'s profile`} />
             ) : (
@@ -329,8 +339,7 @@ export default function Buzz({
             </IconUsernameWrapper>
             {!(isSelected && isEditFlag && !hidHome) && (
               <BuzzTime>
-                {formatDate(updatedAt ? updatedAt : createdAt) +
-                  (updatedAt ? " (수정됨)" : "")}
+                {formatDate(createdAt) + (updatedAt ? " (수정됨)" : "")}
               </BuzzTime>
             )}
           </ProfileTxtWrapper>
@@ -348,7 +357,7 @@ export default function Buzz({
           <Payload>{buzz}</Payload>
         )}
       </Column>
-      <Column>
+      <ImageColumn>
         {isSelected && isEditFlag && !hidHome ? (
           <>
             {previewImg && (
@@ -383,7 +392,7 @@ export default function Buzz({
         ) : (
           photo && <Photo src={photo} />
         )}
-      </Column>
+      </ImageColumn>
       <Column>
         {isSelected && isEditFlag && !hidHome && (
           <PostIconWrapper>

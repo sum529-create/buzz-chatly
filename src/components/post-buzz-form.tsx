@@ -210,7 +210,7 @@ export default function PostBuzzForm({
         setPreviewImg(photo);
       }
     }
-    // setShowBuzzForm(editBtnFlag);
+    setShowBuzzForm(editBtnFlag);
   }, [editBtnFlag, buzz, photo]);
 
   // useEffect(() => {
@@ -374,7 +374,9 @@ export default function PostBuzzForm({
       {showBuzzForm ? (
         <Form onSubmit={onSubmit} $isFocused={isFocused}>
           <ProfileWrapper>
-            <ProfileImageWrapper>
+            <ProfileImageWrapper
+              className={avatar ? "bg-transparent" : "bg-colored"}
+            >
               {avatar ? (
                 <ProfileImage src={avatar} alt={`${userNm}'s profile`} />
               ) : (

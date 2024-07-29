@@ -28,6 +28,7 @@ import {
   DeleteButton,
   EditButton,
   IconButton,
+  ProfileImageWrapper,
 } from "../components/common-component";
 
 const AvatarUpload = styled.label`
@@ -41,17 +42,9 @@ const AvatarUpload = styled.label`
   }
 `;
 
-const AvatarWrapper = styled.div`
-  position: relative;
+const AvatarWrapper = styled(ProfileImageWrapper)`
   width: 80px;
-  overflow: hidden;
   height: 80px;
-  border-radius: 50%;
-  background-color: #079992;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const AvatarImg = styled.img`
@@ -88,6 +81,7 @@ const Buzzs = styled.div`
   overflow-y: scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  padding: 20px;
 `;
 
 const slideUp = keyframes`
@@ -293,6 +287,7 @@ export default function Profile() {
       <AvatarWrapper
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        className={avatar ? "bg-transparent" : "bg-colored"}
       >
         <AvatarUpload htmlFor="avatar">
           {avatar ? (

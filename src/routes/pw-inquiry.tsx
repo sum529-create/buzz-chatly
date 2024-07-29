@@ -29,7 +29,9 @@ export default function PwInquiry() {
     try {
       setLoading(true);
       await sendPasswordResetEmail(auth, email);
-      alert("Password reset email sent.\nPlease check your inbox.");
+      alert(
+        "비밀번호 관련정보를 입력하신 이메일로 전달하였습니다.\n메일을 확인해주세요."
+      );
       navigate("/login");
     } catch (error: any) {
       if (error instanceof FirebaseError) {

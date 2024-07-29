@@ -52,9 +52,30 @@ export default function Login() {
       navigate("/");
     } catch (e: any) {
       if (e instanceof FirebaseError) {
+        let errorMessage = "";
+        switch (e.code) {
+          case "auth/user-not-found":
+            errorMessage =
+              "해당 이메일로 등록된 사용자를 찾을 수 없습니다. 이메일을 확인해주세요.";
+            break;
+          case "auth/wrong-password":
+            errorMessage = "비밀번호가 틀렸습니다. 다시 시도해주세요.";
+            break;
+          case "auth/invalid-email":
+            errorMessage =
+              "유효하지 않은 이메일 주소입니다. 올바른 이메일 주소를 입력해주세요.";
+            break;
+          case "auth/user-disabled":
+            errorMessage =
+              "해당 사용자는 비활성화되었습니다. 관리자에게 문의해주세요.";
+            break;
+          default:
+            errorMessage =
+              "알 수 없는 오류가 발생했습니다. 나중에 다시 시도해주세요.";
+        }
         setState((preVal) => ({
           ...preVal,
-          error: e.message,
+          error: errorMessage,
         }));
       }
     } finally {

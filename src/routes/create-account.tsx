@@ -60,9 +60,31 @@ export default function CreateAccount() {
       navigate("/");
     } catch (e: any) {
       if (e instanceof FirebaseError) {
+        let errorMessage = "";
+        switch (e.code) {
+          case "auth/email-already-in-use":
+            errorMessage =
+              "이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.";
+            break;
+          case "auth/invalid-email":
+            errorMessage =
+              "유효하지 않은 이메일 주소입니다. 올바른 이메일 주소를 입력해주세요.";
+            break;
+          case "auth/operation-not-allowed":
+            errorMessage =
+              "이메일/비밀번호 계정이 활성화되지 않았습니다. 지원팀에 문의해주세요.";
+            break;
+          case "auth/weak-password":
+            errorMessage =
+              "비밀번호가 너무 약합니다. 더 강력한 비밀번호를 입력해주세요.";
+            break;
+          default:
+            errorMessage =
+              "알 수 없는 오류가 발생했습니다. 나중에 다시 시도해주세요.";
+        }
         setState((preVal) => ({
           ...preVal,
-          error: e.message,
+          error: errorMessage,
         }));
       }
     } finally {
@@ -83,6 +105,8 @@ export default function CreateAccount() {
           onChange={handleChange}
           placeholder="Name"
           type="text"
+          maxLength={15}
+          minLength={3}
           required
         />
         <Input

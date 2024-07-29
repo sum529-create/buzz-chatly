@@ -15,13 +15,18 @@ export const ProfileImageWrapper = styled.div`
   height: 45px;
   overflow: hidden;
   border-radius: 50%;
-  background-color: #079992;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   svg {
     width: 30px;
+  }
+  &.bg-colored {
+    background-color: #079992;
+  }
+  &.bg-transparent {
+    background-color: transparent;
   }
 `;
 
