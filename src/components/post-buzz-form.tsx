@@ -210,7 +210,7 @@ export default function PostBuzzForm({
         setPreviewImg(photo);
       }
     }
-    // setShowBuzzForm(editBtnFlag);
+    setShowBuzzForm(editBtnFlag);
   }, [editBtnFlag, buzz, photo]);
 
   // useEffect(() => {

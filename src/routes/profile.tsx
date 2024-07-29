@@ -88,6 +88,7 @@ const Buzzs = styled.div`
   overflow-y: scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  padding: 20px;
 `;
 
 const slideUp = keyframes`

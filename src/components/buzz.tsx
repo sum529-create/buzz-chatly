@@ -42,7 +42,7 @@ const Wrapper = styled.div.attrs<IWrapper>(({ $isSelected, $isEditFlag }) => ({
     }`,
     boxShadow: `${
       $isSelected && $isEditFlag
-        ? "0 0 5px rgba(50, 255, 170, 0.5), 0 0 10px rgba(50, 255, 170, 0.5), 0 0 20px rgba(50, 255, 170, 0.5), 0 0 40px rgba(50, 255, 170, 0.5)"
+        ? "0 0 5px rgba(50, 255, 170, 0.5), 0 0 10px rgba(50, 255, 170, 0.5), 0 0 15px rgba(50, 255, 170, 0.5), 0 0 20px rgba(50, 255, 170, 0.5)"
         : "none"
     }`,
     backgroundColor: `${$isSelected && $isEditFlag && "black"}`,
