@@ -54,7 +54,7 @@ export const IconUsernameWrapper = styled.div`
 export const Username = styled.span`
   font-weight: 600;
   font-size: 18px;
-  line-height: 28px;
+  line-height: 23px;
 `;
 
 export const ButtonArea = styled.div`
@@ -136,7 +136,7 @@ export const IconButton = styled.div`
 export const BuzzTime = styled.div`
   font-size: 14px;
   color: #808e9b;
-  line-height: 17px;
+  line-height: 19px;
 `;
 
 export const Payload = styled.p`

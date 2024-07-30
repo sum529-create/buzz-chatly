@@ -8,7 +8,6 @@ import {
   orderBy,
   query,
   setDoc,
-  updateDoc,
   where,
   writeBatch,
 } from "firebase/firestore";
@@ -84,6 +83,12 @@ const Name = styled.span`
     width: 16px;
     cursor: pointer;
   }
+`;
+
+const InfoAccentText = styled.strong`
+  font-size: 14px;
+  color: #1dd1a1;
+  font-weight: 600;
 `;
 
 const EditNameInput = styled.input`
@@ -395,16 +400,27 @@ export default function Profile() {
           </svg>
         </Name>
       ) : (
-        <Name>
-          <EditNameInput
-            onChange={onChange}
-            value={newName ? newName : ""}
-            type="text"
-          />
-          <EditButton onClick={changeEditName}>수정</EditButton>
-          <DeleteButton onClick={() => setShowEdit(false)}>취소</DeleteButton>
-        </Name>
+        <>
+          <Name>
+            <EditNameInput
+              onChange={onChange}
+              value={newName ? newName : ""}
+              type="text"
+              maxLength={15}
+              minLength={3}
+              placeholder="Name"
+            />
+            <EditButton onClick={changeEditName}>수정</EditButton>
+            <DeleteButton onClick={() => setShowEdit(false)}>취소</DeleteButton>
+          </Name>
+          <InfoAccentText>
+            ※ 닉네임은 3~15자 이내로 입력하셔야합니다.
+          </InfoAccentText>
+        </>
       )}
+      <InfoAccentText>
+        ※ 이미지를 클릭하시면 삭제/변경 하실 수 있습니다.
+      </InfoAccentText>
       <Buzzs>
         {buzz.map((e) => (
           <Buzz
