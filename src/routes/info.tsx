@@ -24,12 +24,12 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-direction: column-reverse;
   width: 100%;
   position: relative;
   overflow: hidden;
-  gap: 200px;
-  padding: 100px 0;
+  gap: 100px;
+  padding: 200px 0;
   @media (min-width: 768px) {
     gap: 5px;
     flex-direction: row;
@@ -118,7 +118,7 @@ const ScrollingText = styled.div<{ delay: number }>`
   animation: ${scroll} 5s linear infinite;
   animation-delay: ${({ delay }) => delay}s;
   width: 100%;
-  height: 10vh;
+  height: 88px;
   display: flex;
   flex-wrap: nowrap;
   padding: 10px;
@@ -128,9 +128,6 @@ const ScrollingText = styled.div<{ delay: number }>`
   flex-direction: column;
   text-align: left;
   align-items: flex-start;
-  @media (max-width: 768px) {
-    height: 15vh;
-  }
 `;
 
 // 버튼 스타일 정의

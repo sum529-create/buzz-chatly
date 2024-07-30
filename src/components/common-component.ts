@@ -27,11 +27,11 @@ export const ProfileImageWrapper = styled.div`
   }
   &.bg-transparent {
     background-color: transparent;
+    border: 1px solid #2f3640;
   }
 `;
 
 export const ProfileImage = styled.img`
-  width: 45px;
   height: 45px;
   border-radius: 50%;
 `;

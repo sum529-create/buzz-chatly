@@ -27,9 +27,22 @@ import { MainWrapper } from "../components/auth-component";
 import {
   DeleteButton,
   EditButton,
-  IconButton,
   ProfileImageWrapper,
 } from "../components/common-component";
+
+const AvatarWrapper = styled(ProfileImageWrapper)`
+  width: 80px;
+  height: 80px;
+  &.bg-colored:hover {
+    background-color: #067a7a74;
+  }
+  &:hover .avatar-add-btn {
+    opacity: 1;
+  }
+  &:hover .avatar-upload {
+    opacity: 0.3;
+  }
+`;
 
 const AvatarUpload = styled.label`
   position: relative;
@@ -37,14 +50,22 @@ const AvatarUpload = styled.label`
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
   svg {
     width: 50px;
   }
 `;
 
-const AvatarWrapper = styled(ProfileImageWrapper)`
-  width: 80px;
-  height: 80px;
+const AvatarAddBtn = styled.div`
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  color: white;
+  svg {
+    width: 30px;
+  }
 `;
 
 const AvatarImg = styled.img`
@@ -289,7 +310,7 @@ export default function Profile() {
         onMouseLeave={() => setHovered(false)}
         className={avatar ? "bg-transparent" : "bg-colored"}
       >
-        <AvatarUpload htmlFor="avatar">
+        <AvatarUpload className="avatar-upload" htmlFor="avatar">
           {avatar ? (
             <AvatarImg src={avatar} />
           ) : (
@@ -310,6 +331,23 @@ export default function Profile() {
             </svg>
           )}
         </AvatarUpload>
+        <AvatarAddBtn className="avatar-add-btn">
+          <svg
+            data-slot="icon"
+            fill="none"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            ></path>
+          </svg>
+        </AvatarAddBtn>
         {avatar && (
           <AvatarCloseBtn $show={hovered ? true : false} onClick={resetAvatar}>
             <svg
