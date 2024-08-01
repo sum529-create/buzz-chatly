@@ -275,6 +275,7 @@ export default function PostBuzzForm({
           createdAt: Date.now(),
           username: user.displayName || "Anonymous",
           userId: user.uid,
+          thumbs: [],
         });
       }
 

@@ -14,6 +14,10 @@ import styled from "styled-components";
 import { db, storage } from "../firebase";
 import Buzz from "./buzz";
 
+export interface IThumbs {
+  userId: string;
+}
+
 export interface IBuzz {
   id: string;
   buzz: string;
@@ -22,6 +26,7 @@ export interface IBuzz {
   photo: string;
   userId: string;
   username: string;
+  thumbs: Array<IThumbs>;
 }
 
 const Wrapper = styled.div`
@@ -69,7 +74,7 @@ export default function Timeline({
     // Create a subscription to Firestore updates
     const unsub: Unsubscribe = onSnapshot(buzzQuery, async (snapshot) => {
       const buzzs: IBuzz[] = snapshot.docs.map((doc) => {
-        const { buzz, createdAt, photo, userId, username, updatedAt } =
+        const { buzz, createdAt, photo, userId, username, updatedAt, thumbs } =
           doc.data();
         return {
           id: doc.id,
@@ -79,6 +84,7 @@ export default function Timeline({
           userId,
           username,
           updatedAt,
+          thumbs,
         };
       });
       setBuzz(buzzs);

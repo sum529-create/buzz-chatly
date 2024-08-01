@@ -79,6 +79,8 @@ const Name = styled.span`
   gap: 4px;
   flex-wrap: wrap;
   align-items: center;
+  position: relative;
+  transform: translateX(10px);
   svg {
     width: 16px;
     cursor: pointer;
@@ -185,7 +187,7 @@ export default function Profile() {
     const snapshot = await getDocs(buzzQuery);
 
     const buzzs = snapshot.docs.map((doc) => {
-      const { buzz, createdAt, userId, username, photo, updatedAt } =
+      const { buzz, createdAt, userId, username, photo, updatedAt, thumbs } =
         doc.data();
       return {
         buzz,
@@ -194,6 +196,7 @@ export default function Profile() {
         username,
         photo,
         updatedAt,
+        thumbs,
         id: doc.id,
       };
     });
