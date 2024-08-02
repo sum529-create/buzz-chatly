@@ -187,8 +187,16 @@ export default function Profile() {
     const snapshot = await getDocs(buzzQuery);
 
     const buzzs = snapshot.docs.map((doc) => {
-      const { buzz, createdAt, userId, username, photo, updatedAt, thumbs } =
-        doc.data();
+      const {
+        buzz,
+        createdAt,
+        userId,
+        username,
+        photo,
+        updatedAt,
+        thumbs,
+        replies,
+      } = doc.data();
       return {
         buzz,
         createdAt,
@@ -198,6 +206,7 @@ export default function Profile() {
         updatedAt,
         thumbs,
         id: doc.id,
+        replies,
       };
     });
     setBuzz(buzzs);

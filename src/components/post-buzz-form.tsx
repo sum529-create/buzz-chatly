@@ -49,7 +49,7 @@ const FormTitle = styled.div`
   }
 `;
 
-const Form = styled.form<{ $isFocused: boolean }>`
+export const Form = styled.form<{ $isFocused: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 10px;
