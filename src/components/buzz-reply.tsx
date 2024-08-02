@@ -1,4 +1,11 @@
-import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  arrayRemove,
+  arrayUnion,
+  deleteDoc,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -27,6 +34,10 @@ interface IBuzzReply {
   profileImg?: string | null;
 }
 
+const BuzzReplyWrapper = styled.div`
+  padding-top: 10px;
+`;
+
 const ReplyReceiver = styled.div`
   font-size: 14px;
   color: #8e8e8e;
@@ -36,15 +47,25 @@ const ReplyReceiver = styled.div`
   }
 `;
 
-const ReplyListWrapper = styled.ul``;
+const ReplyListWrapper = styled.ul`
+  padding: 20px;
+`;
 
 const ReplyItemWrapper = styled.li`
   display: grid;
-  grid-template-columns: 45px auto;
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 1rem;
+  grid-template-columns: 45px auto 91px;
+  padding: 10px 0;
   gap: 10px;
+  position: relative;
+  &:not(:last-child)::after {
+    content: "";
+    background-color: #485460;
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+  }
 `;
 
 export default function BuzzReply({
@@ -54,6 +75,7 @@ export default function BuzzReply({
   replies,
 }: IBuzzReply) {
   const user = auth.currentUser;
+  const docRef = doc(db, "buzz", id);
   const [replyText, setReplyText] = useState("");
   const [reply, setReply] = useState<IReply[]>(replies || []);
   const [profilePic, setProfilePic] = useState<{
@@ -123,7 +145,7 @@ export default function BuzzReply({
         ...profilePicMap,
       }));
     };
-    avatars();
+    if (replies) avatars();
   }, [id, reply, replies]);
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -136,9 +158,17 @@ export default function BuzzReply({
     const strDate = new Date(date);
     return strDate.toLocaleDateString();
   };
+  const fetchReplies = async () => {
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      if (data?.replies) {
+        setReply(data.replies);
+      }
+    }
+  };
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const docRef = doc(db, "buzz", id);
     if (!user || !replyText || replyText.length > 180) {
       return;
     }
@@ -151,6 +181,7 @@ export default function BuzzReply({
           userId: user.uid,
         }),
       });
+      await fetchReplies();
     } catch (error) {
       console.error("send reply error:", error);
     } finally {
@@ -158,8 +189,25 @@ export default function BuzzReply({
     }
   };
 
+  const deleteReply = async (e: number) => {
+    if (user?.uid !== userId) {
+      return;
+    }
+    if (confirm("해당 댓글을 삭제하시겠습니까?")) {
+      try {
+        const updateReply = [...replies.slice(0, e), ...replies.slice(e + 1)];
+        await updateDoc(docRef, {
+          replies: updateReply,
+        });
+        await fetchReplies();
+      } catch (error) {
+        console.error("Fail To delete reply", error);
+      }
+    }
+  };
+
   return (
-    <>
+    <BuzzReplyWrapper>
       <Form onSubmit={onSubmit} $isFocused={false}>
         <ProfileWrapper>
           <ProfileTxtWrapper>
@@ -230,17 +278,21 @@ export default function BuzzReply({
                   {/* <TextArea required rows={5} maxLength={180} /> */}
                   <Payload>{e.buzz}</Payload>
                 </Column>
-                {/* <Column>
-              <ButtonArea>
-                <EditButton>수정</EditButton>
-                <DeleteButton>삭제</DeleteButton>
-              </ButtonArea>
-            </Column> */}
               </ColumnStart>
+              {user?.uid === userId && (
+                <ColumnStart>
+                  <ButtonArea>
+                    <EditButton>수정</EditButton>
+                    <DeleteButton onClick={() => deleteReply(i)}>
+                      삭제
+                    </DeleteButton>
+                  </ButtonArea>
+                </ColumnStart>
+              )}
             </ReplyItemWrapper>
           ))}
         </ReplyListWrapper>
       )}
-    </>
+    </BuzzReplyWrapper>
   );
 }
