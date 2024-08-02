@@ -1,3 +1,5 @@
+import { onAuthStateChanged } from "firebase/auth";
+import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { auth } from "../firebase";
@@ -45,6 +47,7 @@ const MenuItem = styled.div`
   height: 40px;
   width: 40px;
   border-radius: 50%;
+  overflow: hidden;
   svg {
     width: 30px;
     fill: #e0e0e0;
@@ -70,14 +73,38 @@ const MenuItem = styled.div`
   }
 `;
 
+const MenuProfileImageWrapper = styled(ProfileImageWrapper)`
+  width: 40px;
+  height: 40px;
+`;
+
 const MenuProfileImage = styled(ProfileImage)`
   width: auto !important;
   height: 40px;
 `;
 
 export default function Layout() {
-  const user = auth.currentUser;
+  const [user, setUser] = useState<any>(auth.currentUser);
+  const [photoURL, setPhotoURL] = useState<string | undefined>(user?.photoURL);
   const navigate = useNavigate();
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user: any) => {
+      if (user) {
+        setUser(user);
+        setPhotoURL(user.photoURL);
+      } else {
+        setUser(null);
+        setPhotoURL(undefined);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+  useEffect(() => {
+    if (user && user.photoURL !== photoURL) {
+      setPhotoURL(user.photoURL);
+    }
+  }, [user, photoURL]);
   const onLogOut = async () => {
     const ok = confirm("로그아웃 하시겠습니까?");
     if (ok) {
@@ -114,13 +141,13 @@ export default function Layout() {
         </Link>
         <Link to="/profile">
           <MenuItem>
-            {user && user.photoURL ? (
-              <ProfileImageWrapper>
+            {photoURL ? (
+              <MenuProfileImageWrapper>
                 <MenuProfileImage
-                  src={user.photoURL}
+                  src={photoURL}
                   alt={`${user.displayName}'s profile`}
                 />
-              </ProfileImageWrapper>
+              </MenuProfileImageWrapper>
             ) : (
               <svg
                 fill="currentColor"

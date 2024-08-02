@@ -314,7 +314,7 @@ export default function BuzzReply({
             )}
           </ProfileImageWrapper>
           <ProfileTxtWrapper>
-            {user?.displayName}
+            <Username>{user?.displayName}</Username>
             <ReplyReceiver>
               <span>{userName === user?.displayName ? "나" : userName}</span>
               에게 댓글달기

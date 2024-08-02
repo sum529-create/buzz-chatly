@@ -147,4 +147,5 @@ export const BuzzTime = styled.div`
 export const Payload = styled.p`
   margin: 10px 0px;
   font-size: 18px;
+  line-height: 23px;
 `;
