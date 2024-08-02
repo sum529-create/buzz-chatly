@@ -21,6 +21,7 @@ export interface IThumbs {
 export interface IReply {
   buzz: string;
   createdAt: number;
+  updatedAt: number;
   userId: string;
   username: string;
 }

@@ -1,5 +1,4 @@
 import {
-  arrayRemove,
   arrayUnion,
   deleteDoc,
   doc,
@@ -25,7 +24,7 @@ import {
 } from "./common-component";
 import { Form, PostIconWrapper, TextArea } from "./post-buzz-form";
 import { IReply } from "./timeline";
-
+import { v4 as uuidv4 } from "uuid";
 interface IBuzzReply {
   userId: string;
   id: string;
@@ -78,9 +77,11 @@ export default function BuzzReply({
   const docRef = doc(db, "buzz", id);
   const [replyText, setReplyText] = useState("");
   const [reply, setReply] = useState<IReply[]>(replies || []);
+  const [newReplyText, setNewReplyText] = useState("");
   const [profilePic, setProfilePic] = useState<{
     [key: string]: string | null;
   }>({});
+  const [isUpdateIdx, setIsUpdateIdx] = useState<number | null>(null);
 
   useEffect(() => {
     const avatars = async () => {
@@ -151,7 +152,7 @@ export default function BuzzReply({
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setReplyText(e.target.value);
   };
-  const onCancel = () => {
+  const onResetText = () => {
     setReplyText("");
   };
   const formatDate = (date: number) => {
@@ -172,9 +173,11 @@ export default function BuzzReply({
     if (!user || !replyText || replyText.length > 180) {
       return;
     }
+    const newId = uuidv4();
     try {
       await updateDoc(docRef, {
         replies: arrayUnion({
+          id: newId,
           buzz: replyText,
           createdAt: formatDate(Date.now()),
           username: user.displayName,
@@ -185,24 +188,79 @@ export default function BuzzReply({
     } catch (error) {
       console.error("send reply error:", error);
     } finally {
-      onCancel();
+      onResetText();
     }
   };
 
-  const deleteReply = async (e: number) => {
-    if (user?.uid !== userId) {
+  const deleteReply = async (e: any, i: number) => {
+    if (user?.uid !== e.userId) {
       return;
     }
     if (confirm("해당 댓글을 삭제하시겠습니까?")) {
       try {
-        const updateReply = [...replies.slice(0, e), ...replies.slice(e + 1)];
+        const updateReplyLists = [
+          ...replies.slice(0, i),
+          ...replies.slice(i + 1),
+        ];
         await updateDoc(docRef, {
-          replies: updateReply,
+          replies: updateReplyLists,
         });
         await fetchReplies();
       } catch (error) {
-        console.error("Fail To delete reply", error);
+        console.error("Failed to delete comments", error);
       }
+    }
+  };
+
+  const onNewReply = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewReplyText(e.target.value);
+  };
+
+  const updateReply = async (e: any, i: number) => {
+    if (user?.uid !== e.userId) {
+      return;
+    }
+    setNewReplyText(e.buzz);
+    setIsUpdateIdx(i);
+  };
+
+  const cancelReply = () => {
+    setNewReplyText("");
+    setIsUpdateIdx(null);
+  };
+
+  const updateNewReply = async (buzz: string) => {
+    if (!newReplyText) {
+      alert("수정하실 댓글을 입력해주세요.");
+      return;
+    }
+    if (buzz === newReplyText) {
+      cancelReply();
+      return;
+    }
+    if (newReplyText.length > 180) {
+      alert("텍스트는 180자 이하로 입력해주세요.");
+      return;
+    }
+    if (!isUpdateIdx && isUpdateIdx !== 0) {
+      return;
+    }
+    try {
+      const currReplyList = replies;
+      if (currReplyList[isUpdateIdx]) {
+        currReplyList[isUpdateIdx] = {
+          ...replies[isUpdateIdx],
+          buzz: newReplyText,
+          updatedAt: Date.now(),
+        };
+      }
+      await updateDoc(docRef, {
+        replies: replies,
+      });
+      cancelReply();
+      fetchReplies();
+    } catch (error) {
+      console.error("Failed to edit comments", error);
     }
   };
 
@@ -214,7 +272,7 @@ export default function BuzzReply({
             {user?.displayName}
             <ReplyReceiver>
               <span>{userName === user?.displayName ? "나" : userName}</span>
-              에게 답장하기
+              에게 댓글달기
             </ReplyReceiver>
           </ProfileTxtWrapper>
         </ProfileWrapper>
@@ -229,7 +287,7 @@ export default function BuzzReply({
         <PostIconWrapper>
           <ButtonArea>
             <EditButton type="submit">등록</EditButton>
-            <DeleteButton onClick={onCancel}>초기화</DeleteButton>
+            <DeleteButton onClick={onResetText}>초기화</DeleteButton>
           </ButtonArea>
         </PostIconWrapper>
       </Form>
@@ -271,22 +329,43 @@ export default function BuzzReply({
                   <ProfileWrapper>
                     <ProfileTxtWrapper>
                       <Username>{e.username}</Username>
-                      <BuzzTime>{e.createdAt}</BuzzTime>
+                      <BuzzTime>
+                        {e.createdAt + (e.updatedAt ? " (수정됨)" : "")}
+                      </BuzzTime>
                     </ProfileTxtWrapper>
                   </ProfileWrapper>
-                  {/* 분기처리 */}
-                  {/* <TextArea required rows={5} maxLength={180} /> */}
-                  <Payload>{e.buzz}</Payload>
+                  {isUpdateIdx === i && user?.uid === e.userId ? (
+                    <TextArea
+                      required
+                      rows={5}
+                      maxLength={180}
+                      onChange={onNewReply}
+                      value={newReplyText}
+                    />
+                  ) : (
+                    <Payload>{e.buzz}</Payload>
+                  )}
                 </Column>
               </ColumnStart>
-              {user?.uid === userId && (
+              {user?.uid === e.userId && (
                 <ColumnStart>
-                  <ButtonArea>
-                    <EditButton>수정</EditButton>
-                    <DeleteButton onClick={() => deleteReply(i)}>
-                      삭제
-                    </DeleteButton>
-                  </ButtonArea>
+                  {isUpdateIdx === i ? (
+                    <ButtonArea>
+                      <EditButton onClick={() => updateNewReply(e.buzz)}>
+                        수정
+                      </EditButton>
+                      <DeleteButton onClick={cancelReply}>취소</DeleteButton>
+                    </ButtonArea>
+                  ) : (
+                    <ButtonArea>
+                      <EditButton onClick={() => updateReply(e, i)}>
+                        수정
+                      </EditButton>
+                      <DeleteButton onClick={() => deleteReply(e, i)}>
+                        삭제
+                      </DeleteButton>
+                    </ButtonArea>
+                  )}
                 </ColumnStart>
               )}
             </ReplyItemWrapper>
