@@ -350,9 +350,11 @@ export default function BuzzReply({
             >
               <ColumnStart>
                 <ProfileImageWrapper
-                  className={profilePic ? "bg-transparent" : "bg-colored"}
+                  className={
+                    profilePic[e.userId] ? "bg-transparent" : "bg-colored"
+                  }
                 >
-                  {profilePic ? (
+                  {profilePic[e.userId] ? (
                     <ProfileImage
                       src={profilePic[e.userId] || ""}
                       alt={`${e.username}'s profile`}
