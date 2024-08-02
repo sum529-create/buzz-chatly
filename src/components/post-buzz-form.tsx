@@ -49,7 +49,7 @@ const FormTitle = styled.div`
   }
 `;
 
-const Form = styled.form<{ $isFocused: boolean }>`
+export const Form = styled.form<{ $isFocused: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -275,6 +275,7 @@ export default function PostBuzzForm({
           createdAt: Date.now(),
           username: user.displayName || "Anonymous",
           userId: user.uid,
+          thumbs: [],
         });
       }
 
