@@ -1,10 +1,4 @@
-import {
-  arrayUnion,
-  deleteDoc,
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -13,6 +7,7 @@ import { Column, ColumnStart } from "./buzz";
 import {
   ButtonArea,
   BuzzTime,
+  CancelButton,
   DeleteButton,
   EditButton,
   Payload,
@@ -22,7 +17,13 @@ import {
   ProfileWrapper,
   Username,
 } from "./common-component";
-import { Form, PostIconWrapper, TextArea } from "./post-buzz-form";
+import {
+  ByteLength,
+  Form,
+  PostIconWrapper,
+  TextArea,
+  TextAreaWrapper,
+} from "./post-buzz-form";
 import { IReply } from "./timeline";
 import { v4 as uuidv4 } from "uuid";
 interface IBuzzReply {
@@ -33,12 +34,27 @@ interface IBuzzReply {
   profileImg?: string | null;
 }
 
+const ReplyForm = styled(Form)`
+  border-radius: 0;
+  border: none;
+  border-top: 2px solid rgb(0, 205, 254);
+  background-color: #141d26;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+`;
+
+const ReplyTextArea = styled(TextArea)`
+  background-color: #3c4a56;
+`;
+
 const BuzzReplyWrapper = styled.div`
-  padding-top: 10px;
+  margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
 `;
 
 const ReplyReceiver = styled.div`
   font-size: 14px;
+  line-height: 18px;
   color: #8e8e8e;
   span {
     color: #16a085;
@@ -46,16 +62,17 @@ const ReplyReceiver = styled.div`
   }
 `;
 
-const ReplyListWrapper = styled.ul`
-  padding: 20px;
-`;
+const ReplyListWrapper = styled.ul``;
 
 const ReplyItemWrapper = styled.li`
   display: grid;
   grid-template-columns: 45px auto 91px;
-  padding: 10px 0;
+  padding: 20px;
   gap: 10px;
   position: relative;
+  &.editing {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  }
   &:not(:last-child)::after {
     content: "";
     background-color: #485460;
@@ -78,12 +95,14 @@ export default function BuzzReply({
   const [replyText, setReplyText] = useState("");
   const [reply, setReply] = useState<IReply[]>(replies || []);
   const [newReplyText, setNewReplyText] = useState("");
+  const [avatar, setAvatar] = useState("");
   const [profilePic, setProfilePic] = useState<{
     [key: string]: string | null;
   }>({});
   const [isUpdateIdx, setIsUpdateIdx] = useState<number | null>(null);
 
   useEffect(() => {
+    if (user && user.photoURL) setAvatar(user.photoURL);
     const avatars = async () => {
       const userIdCnt: { [key: string]: number } = replies.reduce(
         (acc, obj) => {
@@ -266,8 +285,34 @@ export default function BuzzReply({
 
   return (
     <BuzzReplyWrapper>
-      <Form onSubmit={onSubmit} $isFocused={false}>
+      <ReplyForm onSubmit={onSubmit} $isFocused={false}>
         <ProfileWrapper>
+          <ProfileImageWrapper
+            className={avatar ? "bg-transparent" : "bg-colored"}
+          >
+            {avatar ? (
+              <ProfileImage
+                src={avatar}
+                alt={`${user?.displayName}'s profile`}
+              />
+            ) : (
+              <svg
+                data-slot="icon"
+                fill="none"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                ></path>
+              </svg>
+            )}
+          </ProfileImageWrapper>
           <ProfileTxtWrapper>
             {user?.displayName}
             <ReplyReceiver>
@@ -276,29 +321,36 @@ export default function BuzzReply({
             </ReplyReceiver>
           </ProfileTxtWrapper>
         </ProfileWrapper>
-        <TextArea
-          required
-          rows={5}
-          maxLength={180}
-          value={replyText}
-          placeholder="댓글을 입력하세요."
-          onChange={onChange}
-        />
+        <TextAreaWrapper>
+          <ReplyTextArea
+            required
+            rows={5}
+            maxLength={180}
+            value={replyText}
+            placeholder="댓글을 입력하세요."
+            onChange={onChange}
+          />
+          <ByteLength>{"(" + replyText.length + "/ 180)"}</ByteLength>
+        </TextAreaWrapper>
         <PostIconWrapper>
           <ButtonArea>
             <EditButton type="submit">등록</EditButton>
-            <DeleteButton onClick={onResetText}>초기화</DeleteButton>
+            <CancelButton onClick={onResetText}>초기화</CancelButton>
           </ButtonArea>
         </PostIconWrapper>
-      </Form>
+      </ReplyForm>
       {reply && reply.length > 0 && (
         <ReplyListWrapper>
           {reply.map((e, i) => (
-            <ReplyItemWrapper key={i}>
+            <ReplyItemWrapper
+              key={i}
+              className={
+                isUpdateIdx === i && user?.uid === e.userId ? "editing" : ""
+              }
+            >
               <ColumnStart>
                 <ProfileImageWrapper
                   className={profilePic ? "bg-transparent" : "bg-colored"}
-                  //   className={"bg-colored"}
                 >
                   {profilePic ? (
                     <ProfileImage
@@ -335,13 +387,18 @@ export default function BuzzReply({
                     </ProfileTxtWrapper>
                   </ProfileWrapper>
                   {isUpdateIdx === i && user?.uid === e.userId ? (
-                    <TextArea
-                      required
-                      rows={5}
-                      maxLength={180}
-                      onChange={onNewReply}
-                      value={newReplyText}
-                    />
+                    <TextAreaWrapper>
+                      <ReplyTextArea
+                        required
+                        rows={5}
+                        maxLength={180}
+                        onChange={onNewReply}
+                        value={newReplyText}
+                      />
+                      <ByteLength>
+                        {"(" + newReplyText.length + "/ 180)"}
+                      </ByteLength>
+                    </TextAreaWrapper>
                   ) : (
                     <Payload>{e.buzz}</Payload>
                   )}
@@ -354,7 +411,7 @@ export default function BuzzReply({
                       <EditButton onClick={() => updateNewReply(e.buzz)}>
                         수정
                       </EditButton>
-                      <DeleteButton onClick={cancelReply}>취소</DeleteButton>
+                      <CancelButton onClick={cancelReply}>취소</CancelButton>
                     </ButtonArea>
                   ) : (
                     <ButtonArea>

@@ -10,7 +10,7 @@ import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import {
   ButtonArea,
-  DeleteButton,
+  CancelButton,
   EditButton,
   ProfileImage,
   ProfileImageWrapper,
@@ -26,6 +26,7 @@ const FormTitle = styled.div`
   flex-wrap: wrap;
   align-items: center;
   width: 100%;
+  margin: 10px 0;
   svg {
     width: 24px;
   }
@@ -58,7 +59,7 @@ export const Form = styled.form<{ $isFocused: boolean }>`
   padding: 10px 20px;
   background-color: black;
   border-radius: 20px;
-  border: 2px solid white;
+  border: 1px solid #e7e9ea;
   ${({ $isFocused }) =>
     $isFocused &&
     `
@@ -86,6 +87,21 @@ export const TextArea = styled.textarea`
   }
 `;
 
+export const TextAreaWrapper = styled.div`
+  position: relative;
+`;
+
+export const ByteLength = styled.p`
+  position: absolute;
+  padding: 9px 0;
+  color: #aaa;
+  font-size: 15px;
+  line-height: 1;
+  text-align: right;
+  right: 17px;
+  bottom: 2px;
+`;
+
 export const PostIconWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -101,8 +117,8 @@ export const PostIconWrapper = styled.div`
     top: -10px;
     left: 0;
     width: 100%;
-    height: 1px; /* 선의 두께 */
-    background-color: #ccc; /* 선의 색상 */
+    height: 1px;
+    background-color: rgb(47, 51, 54);
   }
 `;
 
@@ -402,16 +418,19 @@ export default function PostBuzzForm({
               <Username>{userNm}</Username>
             </ProfileTxtWrapper>
           </ProfileWrapper>
-          <TextArea
-            required
-            rows={5}
-            maxLength={180}
-            onChange={onChange}
-            value={newBuzz}
-            placeholder="What is happening?!"
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          />
+          <TextAreaWrapper>
+            <TextArea
+              required
+              rows={5}
+              maxLength={180}
+              onChange={onChange}
+              value={newBuzz}
+              placeholder="무슨 일이 일어나고 있나요?"
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+            />
+            <ByteLength>{"(" + newBuzz.length + "/ 180)"}</ByteLength>
+          </TextAreaWrapper>
           {previewImg && (
             <>
               <EditArea onClick={closeImg}>
@@ -500,7 +519,7 @@ export default function PostBuzzForm({
                 {isLoading ? "Posting..." : editBtnFlag ? "수정" : "게시"}
               </EditButton>
               {editBtnFlag && (
-                <DeleteButton onClick={() => openBuzzForm()}>취소</DeleteButton>
+                <CancelButton onClick={() => openBuzzForm()}>취소</CancelButton>
               )}
             </ButtonArea>
           </PostIconWrapper>

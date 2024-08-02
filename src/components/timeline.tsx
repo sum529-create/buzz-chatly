@@ -47,6 +47,7 @@ const Wrapper = styled.div`
   scrollbar-width: none; /* Firefox */
   flex: 1;
   width: 100%;
+  margin: 10px 0;
   &::-webkit-scrollbar {
     display: none;
   }

@@ -1,6 +1,7 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { auth } from "../firebase";
+import { ProfileImage, ProfileImageWrapper } from "./common-component";
 
 const Wrapper = styled.div`
   /* display: grid; */
@@ -69,7 +70,13 @@ const MenuItem = styled.div`
   }
 `;
 
+const MenuProfileImage = styled(ProfileImage)`
+  width: auto !important;
+  height: 40px;
+`;
+
 export default function Layout() {
+  const user = auth.currentUser;
   const navigate = useNavigate();
   const onLogOut = async () => {
     const ok = confirm("로그아웃 하시겠습니까?");
@@ -107,14 +114,23 @@ export default function Layout() {
         </Link>
         <Link to="/profile">
           <MenuItem>
-            <svg
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
-            </svg>
+            {user && user.photoURL ? (
+              <ProfileImageWrapper>
+                <MenuProfileImage
+                  src={user.photoURL}
+                  alt={`${user.displayName}'s profile`}
+                />
+              </ProfileImageWrapper>
+            ) : (
+              <svg
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
+              </svg>
+            )}
           </MenuItem>
         </Link>
         <MenuItem onClick={onLogOut} className="log-out">

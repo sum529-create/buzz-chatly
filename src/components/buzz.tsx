@@ -24,7 +24,7 @@ import {
 import {
   ButtonArea,
   BuzzTime,
-  DeleteButton,
+  CancelButton,
   EditButton,
   IconButton,
   IconUsernameWrapper,
@@ -45,12 +45,12 @@ interface IWrapper {
 const Wrapper = styled.div.attrs<IWrapper>(({ $isSelected, $isEditFlag }) => ({
   style: {
     border: `1px solid ${
-      $isSelected && $isEditFlag ? "whtie" : "rgba(255, 255, 255, 0.5)"
+      $isSelected && $isEditFlag ? "whtie" : "rgb(47, 51, 54)"
     }`,
     boxShadow: `${
       $isSelected && $isEditFlag
         ? "0 0 5px rgba(50, 255, 170, 0.5), 0 0 10px rgba(50, 255, 170, 0.5), 0 0 15px rgba(50, 255, 170, 0.5), 0 0 20px rgba(50, 255, 170, 0.5)"
-        : "none"
+        : "0 6px 12px rgba(0, 0, 0, 0.15)"
     }`,
     backgroundColor: `${$isSelected && $isEditFlag && "black"}`,
   },
@@ -59,7 +59,6 @@ const Wrapper = styled.div.attrs<IWrapper>(({ $isSelected, $isEditFlag }) => ({
   grid-template-columns: 45px auto;
   padding: 20px;
   border-radius: 15px;
-  margin-bottom: 1rem;
   gap: 10px;
 `;
 
@@ -523,7 +522,7 @@ export default function Buzz({
               </ButtonArea>
               <ButtonArea>
                 <EditButton onClick={onChangeBuzz}>수정</EditButton>
-                <DeleteButton onClick={onCancel}>취소</DeleteButton>
+                <CancelButton onClick={onCancel}>취소</CancelButton>
               </ButtonArea>
             </PostIconWrapper>
           </Column>

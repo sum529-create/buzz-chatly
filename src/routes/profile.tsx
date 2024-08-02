@@ -24,7 +24,7 @@ import { IBuzz } from "../components/timeline";
 import Buzz from "../components/buzz";
 import { MainWrapper } from "../components/auth-component";
 import {
-  DeleteButton,
+  CancelButton,
   EditButton,
   ProfileImageWrapper,
 } from "../components/common-component";
@@ -81,6 +81,7 @@ const Name = styled.span`
   align-items: center;
   position: relative;
   transform: translateX(10px);
+  margin: 10px 0;
   svg {
     width: 16px;
     cursor: pointer;
@@ -423,7 +424,7 @@ export default function Profile() {
               placeholder="Name"
             />
             <EditButton onClick={changeEditName}>수정</EditButton>
-            <DeleteButton onClick={() => setShowEdit(false)}>취소</DeleteButton>
+            <CancelButton onClick={() => setShowEdit(false)}>취소</CancelButton>
           </Name>
           <InfoAccentText>
             ※ 닉네임은 3~15자 이내로 입력하셔야합니다.

@@ -83,6 +83,11 @@ export const DeleteButton = styled.button`
   }
 `;
 
+export const CancelButton = styled(DeleteButton)`
+  background-color: #4f4f4f;
+  border-color: #4f4f4f;
+`;
+
 export const EditButton = styled.button`
   background-color: #1d9bf0;
   color: #fff;
