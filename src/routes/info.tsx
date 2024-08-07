@@ -117,7 +117,6 @@ const ScrollingText = styled.div<{ delay: number }>`
   animation: ${scroll} 5s linear infinite;
   animation-delay: ${({ delay }) => delay}s;
   width: 100%;
-  height: 88px;
   display: flex;
   flex-wrap: nowrap;
   padding: 10px;
@@ -181,7 +180,8 @@ const InfoBuzzTime = styled(BuzzTime)`
 `;
 
 const InfoPayload = styled(Payload)`
-  font-size: 1rem;
+  font-size: 15px;
+  line-height: 15px;
 `;
 
 // 텍스트 스타일 정의
@@ -333,7 +333,7 @@ export default function Info() {
             </Switcher>
             <br />
             <Switcher>
-              계정이 없으시다면, 저회와 함께해요!{" "}
+              저회와 함께해요!{" "}
               <Link to="/create-account">가입하기 &rarr;</Link>
             </Switcher>
           </SmallText>
