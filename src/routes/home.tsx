@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MainWrapper } from "../components/auth-component";
 import PostBuzzForm from "../components/post-buzz-form";
 import Timeline, { IBuzz } from "../components/timeline";

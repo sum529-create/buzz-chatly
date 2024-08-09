@@ -173,7 +173,6 @@ export default function PostBuzzForm({
   photo,
   buzz,
   id,
-  username,
   userId,
   onValueChange,
   editBtnFlag,

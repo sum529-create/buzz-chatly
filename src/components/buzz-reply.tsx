@@ -85,7 +85,6 @@ const ReplyItemWrapper = styled.li`
 `;
 
 export default function BuzzReply({
-  userId,
   id,
   userName,
   replies,
@@ -211,7 +210,7 @@ export default function BuzzReply({
     }
   };
 
-  const deleteReply = async (e: any, i: number) => {
+  const deleteReply = async (e: IReply, i: number) => {
     if (user?.uid !== e.userId) {
       return;
     }
@@ -235,7 +234,7 @@ export default function BuzzReply({
     setNewReplyText(e.target.value);
   };
 
-  const updateReply = async (e: any, i: number) => {
+  const updateReply = async (e: IReply, i: number) => {
     if (user?.uid !== e.userId) {
       return;
     }
