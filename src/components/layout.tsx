@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { auth } from "../firebase";
 import { ProfileImage, ProfileImageWrapper } from "./common-component";
+import { useDataContext } from '../DataContext';
 
 const Wrapper = styled.div`
   /* display: grid; */
@@ -86,6 +88,7 @@ const MenuProfileImage = styled(ProfileImage)`
 export default function Layout() {
   const [user, setUser] = useState<any>(auth.currentUser);
   const [photoURL, setPhotoURL] = useState<string | undefined>(user?.photoURL);
+  const { profileData } = useDataContext();
   const navigate = useNavigate();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user: any) => {
@@ -144,7 +147,7 @@ export default function Layout() {
             {photoURL ? (
               <MenuProfileImageWrapper>
                 <MenuProfileImage
-                  src={photoURL}
+                  src={profileData ? profileData.imgUrl : photoURL}
                   alt={`${user.displayName}'s profile`}
                 />
               </MenuProfileImageWrapper>

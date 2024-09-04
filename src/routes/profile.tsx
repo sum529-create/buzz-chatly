@@ -17,7 +17,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState  } from "react";
 import styled, { keyframes } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { IBuzz } from "../components/timeline";
@@ -28,6 +28,7 @@ import {
   EditButton,
   ProfileImageWrapper,
 } from "../components/common-component";
+import { useDataContext } from '../DataContext';
 
 const AvatarWrapper = styled(ProfileImageWrapper)`
   width: 80px;
@@ -154,6 +155,7 @@ export default function Profile() {
   const [hovered, setHovered] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const { setProfileData } = useDataContext();
   const handleSelect = (id: string) => {
     setSelected(id);
   };
@@ -170,6 +172,8 @@ export default function Profile() {
         const avatarUrl = await getDownloadURL(result.ref);
         
         setAvatar(avatarUrl);
+        const newProfileData = { imgUrl: avatarUrl };
+        setProfileData(newProfileData);
         await updateProfile(user, {
           photoURL: avatarUrl,
         });
