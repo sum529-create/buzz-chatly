@@ -58,7 +58,7 @@ export default function CreateAccount() {
       });
       // 홈페이지로 리다이렉트
       navigate("/");
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (e instanceof FirebaseError) {
         let errorMessage = "";
         switch (e.code) {

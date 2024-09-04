@@ -160,22 +160,32 @@ export default function Profile() {
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (!user) return;
+    
     if (files && files.length === 1) {
-      const file = files[0];
-      const locationRef = ref(storage, `avatars/${user?.uid}`);
-      const result = await uploadBytes(locationRef, file);
-      const avatarUrl = await getDownloadURL(result.ref);
-      setAvatar(avatarUrl);
-      await updateProfile(user, {
-        photoURL: avatarUrl,
-      });
+      try {
+        const file = files[0];
+        
+        const locationRef = ref(storage, `avatars/${user?.uid}`);
+        const result = await uploadBytes(locationRef, file);
+        const avatarUrl = await getDownloadURL(result.ref);
+        
+        setAvatar(avatarUrl);
+        await updateProfile(user, {
+          photoURL: avatarUrl,
+        });
 
-      const profileDocRef = doc(collection(db, "profile_images"), user.uid);
-      await setDoc(profileDocRef, {
-        hasProfileImage: true,
-        profileImageUrl: avatarUrl,
-      });
-      fetchData();
+        const profileDocRef = doc(collection(db, "profile_images"), user.uid);
+        await setDoc(profileDocRef, {
+          hasProfileImage: true,
+          profileImageUrl: avatarUrl,
+        });
+          fetchData();
+          e.target.value = '';
+
+      } catch (error) {
+        console.error('Error updating avatar:', error);
+        // 에러 처리 로직 추가
+      }
     }
   };
   const fetchData = async () => {
